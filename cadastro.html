@@ -53,6 +53,13 @@
             <input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor responsável">
             <label>Quantidade estimada de alunos participantes</label>
             <input type="number" id="escola-alunos" placeholder="Ex: 200">
+            <label>Possui espaço para horta? *</label>
+            <select id="escola-espaco">
+                <option>Selecione...</option>
+                <option>Sim, possui espaço disponível</option>
+                <option>Não, mas temos interesse</option>
+                <option>Precisamos avaliar</option>
+            </select>
             <label>Observações</label>
             <textarea id="escola-obs" placeholder="Informações adicionais..."></textarea>
             <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
@@ -73,13 +80,6 @@
             <input type="text" id="lar-responsavel" placeholder="Nome do responsável">
             <label>Quantidade de idosos residentes</label>
             <input type="number" id="lar-idosos" placeholder="Ex: 40">
-            <label>Possui espaço para horta?</label>
-            <select id="lar-espaco">
-                <option>Selecione...</option>
-                <option>Sim, possui espaço disponível</option>
-                <option>Não, mas temos interesse</option>
-                <option>Precisamos avaliar</option>
-            </select>
             <label>Observações</label>
             <textarea id="lar-obs" placeholder="Informações adicionais..."></textarea>
             <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Instituição</button>
@@ -117,7 +117,6 @@
             <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
         </div>
 
-        <!-- LISTA DE CADASTROS -->
         <div id="lista-cadastros" style="margin-top: 30px; display: none;">
             <h2>📋 Instituições Cadastradas</h2>
             <div id="tabela-cadastros"></div>
