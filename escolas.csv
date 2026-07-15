@@ -1,0 +1,6 @@
+"tipo;nome;endereco;telefone;email;responsavel;qtd_alunos;observacoes"
+"Escola;EMEF Passo D'Areia;Rua Passo D'Areia, 100 - Bairro Passo D'Areia;(51) 99999-0001;emef.passodareia@educacao.poa.br;;200;"
+"Escola;EMEF Padre Rambo;Rua Padre Rambo, 200 - Bairro Passo D'Areia;(51) 99999-0002;emef.padrerambo@educacao.poa.br;;180;"
+"Escola;EMEF José do Patrocínio;Av. José do Patrocínio, 300 - Bairro Passo D'Areia;(51) 99999-0003;emef.josepatrocinio@educacao.poa.br;;250;"
+"Escola;EMEF Afonso Guerreiro Lima;Rua Guerreiro Lima, 150 - Bairro Passo D'Areia;(51) 99999-0004;emef.guerreirolima@educacao.poa.br;;150;"
+"Escola;EMEF Senador Alberto Pasqualini;Rua Alberto Pasqualini, 80 - Bairro Passo D'Areia;(51) 99999-0005;emef.pasqualini@educacao.poa.br;;220;"

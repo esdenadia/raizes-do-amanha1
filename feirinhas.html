@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feirinhas Solidárias - Raízes do Amanhã</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #f0f7f4; min-height: 100vh; }
+    header {
+      background: linear-gradient(135deg, #1b4332, #2d6a4f);
+      color: #fff; text-align: center; padding: 40px 20px;
+    }
+    header h1 { font-size: 2em; margin-bottom: 8px; }
+    header p { font-size: 1.1em; opacity: 0.9; }
+    .nav-bar {
+      background: #2d6a4f; display: flex; justify-content: center;
+      gap: 4px; padding: 10px 20px; flex-wrap: wrap;
+    }
+    .nav-bar a {
+      color: #fff; text-decoration: none; padding: 8px 20px;
+      border-radius: 6px; font-weight: 600; font-size: 0.95em;
+      transition: background 0.3s;
+    }
+    .nav-bar a:hover, .nav-bar a.ativo { background: #1b4332; }
+
+    .container {
+      max-width: 960px; margin: 30px auto; padding: 0 20px;
+    }
+    .card {
+      background: #fff; border-radius: 12px; padding: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 25px;
+    }
+    .card h2 { color: #1b4332; margin-bottom: 15px; font-size: 1.4em; }
+    .card p { color: #555; line-height: 1.6; margin-bottom: 12px; }
+
+    .info-feirinha {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px; margin: 20px 0;
+    }
+    .info-item {
+      background: #f0f7f4; border-radius: 10px; padding: 18px; text-align: center;
+    }
+    .info-item .icone { font-size: 2em; margin-bottom: 8px; }
+    .info-item .rotulo { font-size: 0.85em; color: #666; }
+    .info-item .valor { font-size: 1.1em; font-weight: 700; color: #1b4332; margin-top: 4px; }
+
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 15px;
+    }
+    th {
+      background: #2d6a4f; color: #fff; padding: 12px; text-align: left;
+      font-size: 0.95em;
+    }
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child { border-radius: 0 8px 0 0; }
+    td {
+      padding: 12px; border-bottom: 1px solid #e0e0e0; font-size: 0.95em;
+    }
+    tr:hover td { background: #f5faf7; }
+    .status-ativo {
+      background: #d4edda; color: #155724; padding: 4px 12px;
+      border-radius: 12px; font-size: 0.85em; font-weight: 600;
+    }
+    .mensagem-vazia {
+      text-align: center; padding: 40px 20px; color: #888;
+    }
+    .mensagem-vazia .icone { font-size: 3em; margin-bottom: 10px; }
+    .btn {
+      display: inline-block; background: #2d6a4f; color: #fff;
+      padding: 12px 28px; border-radius: 8px; text-decoration: none;
+      font-weight: 600; transition: background 0.3s; border: none; cursor: pointer;
+      font-size: 1em;
+    }
+    .btn:hover { background: #1b4332; }
+    .btn-secundario {
+      background: transparent; color: #2d6a4f; border: 2px solid #2d6a4f;
+    }
+    .btn-secundario:hover { background: #e8f5ee; }
+
+    footer {
+      background: #1b4332; color: #aaa; text-align: center;
+      padding: 30px 20px; margin-top: 40px; font-size: 0.9em;
+    }
+    footer strong { color: #fff; }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4em; }
+      .card { padding: 20px; }
+      .info-feirinha { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 Feirinhas Solidárias</h1>
+  <p>Distribuição de alimentos cultivados nas hortas comunitárias</p>
+</header>
+
+<nav class="nav-bar">
+  <a href="index.html">🏠 Início</a>
+  <a href="cadastro.html">📝 Cadastro</a>
+  <a href="feirinhas.html" class="ativo">🌽 Feirinhas</a>
+</nav>
+
+<div class="container">
+
+  <!-- INFO GERAL -->
+  <div class="card">
+    <h2>📌 Como funciona</h2>
+    <p>
+      As <strong>Feirinhas Solidárias</strong> são o ponto alto do projeto Raízes do Amanhã!
+      A cada <strong>15 dias</strong>, os alimentos cultivados nas hortas são disponibilizados
+      para a comunidade em um sistema de <strong>economia circular</strong> — troca de itens
+      domésticos por produtos frescos, fortalecendo a segurança alimentar e os vínculos comunitários.
+    </p>
+    <div class="info-feirinha">
+      <div class="info-item">
+        <div class="icone">📅</div>
+        <div class="rotulo">Frequência</div>
+        <div class="valor">Quinzenal (5ª feira)</div>
+      </div>
+      <div class="info-item">
+        <div class="icone">⏰</div>
+        <div class="rotulo">Horário</div>
+        <div class="valor">9h às 12h</div>
+      </div>
+      <div class="info-item">
+        <div class="icone">📍</div>
+        <div class="rotulo">Local</div>
+        <div class="valor">Escolas participantes</div>
+      </div>
+      <div class="info-item">
+        <div class="icone">🔄</div>
+        <div class="rotulo">Sistema</div>
+        <div class="valor">Economia circular</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="card">
+    <h2>📆 Próximas Feirinhas</h2>
+    <div id="tabela-feirinhas">
+      <p class="mensagem-vazia" id="loading-msg">Carregando agenda...</p>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="card">
+    <h2>📋 Feirinhas Realizadas</h2>
+    <p>Registro das edições anteriores com fotos e resultados.</p>
+    <div class="mensagem-vazia">
+      <div class="icone">📸</div>
+      <p>Nenhuma feirinha realizada ainda.<br>A primeira será registrada aqui!</p>
+    </div>
+  </div>
+
+  <!-- COMO PARTICIPAR -->
+  <div class="card" style="text-align:center;">
+    <h2>🤝 Quer participar?</h2>
+    <p>
+      Escolas e lares de idosos interessados em sediar ou participar das feirinhas
+      podem se cadastrar no projeto.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+      <a href="cadastro.html" class="btn">📝 Fazer cadastro</a>
+      <a href="index.html" class="btn btn-secundario">🏠 Voltar ao início</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><strong>🌿 Raízes do Amanhã</strong> — Sustentabilidade e Segurança Alimentar</p>
+  <p>Projeto de Extensão — UNINTER | Porto Alegre/RS — Bairro Passo D'Areia</p>
+</footer>
+
+<script>
+  // ===== GERAR DATAS QUINZENAIS =====
+  function gerarDatas() {
+    const hoje = new Date();
+    const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    // Buscar próximo(a) quinta-feira
+    const proximaQuinta = new Date(hoje);
+    const diaSemana = hoje.getDay(); // 0=domingo...4=quinta...6=sábado
+    const diasAteQuinta = (4 - diaSemana + 7) % 7;
+    proximaQuinta.setDate(hoje.getDate() + (diasAteQuinta === 0 ? 7 : diasAteQuinta));
+
+    // Gerar 8 datas quinzenais
+    const datas = [];
+    for (let i = 0; i < 8; i++) {
+      const d = new Date(proximaQuinta);
+      d.setDate(proximaQuinta.getDate() + i * 14);
+      const diaSem = dias[d.getDay()];
+      const dia = d.getDate();
+      const mes = meses[d.getMonth()];
+      const ano = d.getFullYear();
+      datas.push({
+        label: `${diaSem}, ${dia} de ${mes} de ${ano}`,
+        dataObj: d
+      });
+    }
+    return datas;
+  }
+
+  // ===== BUSCAR ESCOLAS CADASTRADAS =====
+  function buscarEscolas() {
+    try {
+      const cadastros = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+      return cadastros.filter(c => c.tipo === 'Escola');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // ===== MONTAR TABELA =====
+  function montarAgenda() {
+    const container = document.getElementById('tabela-feirinhas');
+    const datas = gerarDatas();
+    const escolas = buscarEscolas();
+
+    if (escolas.length === 0) {
+      container.innerHTML = `
+        <div class="mensagem-vazia">
+          <div class="icone">🏫</div>
+          <p><strong>Nenhuma escola cadastrada ainda.</strong></p>
+          <p>Cadastre escolas para definir os locais das feirinhas.</p>
+          <a href="cadastro.html" class="btn" style="margin-top:12px;">📝 Cadastrar escola</a>
+        </div>
+      `;
+      return;
+    }
+
+    let html = `
+      <table>
+        <thead>
+          <tr>
+            <th>📅 Data</th>
+            <th>📍 Local</th>
+            <th>⏰ Horário</th>
+            <th>🔖 Status</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    datas.forEach((data, index) => {
+      const escola = escolas[index % escolas.length];
+      const nomeEscola = escola.nome || 'A definir';
+      const status = index === 0 ? 'Próxima edição' : 'Confirmada';
+      html += `
+        <tr>
+          <td><strong>${data.label}</strong></td>
+          <td>${nomeEscola}</td>
+          <td>9h às 12h</td>
+          <td><span class="status-ativo">${status}</span></td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+      <p style="margin-top:10px;font-size:0.85em;color:#888;">
+        * As feirinhas ocorrem às quintas-feiras, a cada 15 dias.
+        Os locais alternam entre as escolas cadastradas.
+      </p>
+    `;
+
+    container.innerHTML = html;
+  }
+
+  // ===== INICIALIZAR =====
+  document.addEventListener('DOMContentLoaded', montarAgenda);
+</script>
+
+</body>
+</html>

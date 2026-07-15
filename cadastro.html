@@ -25,10 +25,16 @@
         footer { text-align: center; padding: 30px; color: #666; }
     </style>
 </head>
+
 <body>
     <header>
-        <h1>📋 Cadastro de Instituições</h1>
-        <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
+    <h1>📋 Cadastro de Instituições</h1>
+    <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
+<div style="text-align:center;background:#2d6a4f;padding:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <a href="index.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;">🏠 Início</a>
+    <a href="cadastro.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;background:#1b4332;">📝 Cadastro</a>
+    <a href="feirinhas.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;">🌽 Feirinhas</a>
+</div>
     </header>
 
     <div class="container">
@@ -207,5 +213,115 @@
 
         abrirLista();
     </script>
+<!-- ===== SEÇÃO DE VISUALIZAÇÃO E IMPORT ===== -->
+<div style="max-width:600px;margin:30px auto;padding:20px;background:#f0f7f4;border-radius:10px;text-align:center;">
+
+  <!-- BOTÃO VER CADASTROS -->
+  <button onclick="abrirLista()" style="background:#2d6a4f;color:#fff;padding:12px 30px;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;margin-bottom:20px;">
+    📋 Ver cadastros
+  </button>
+
+  <div id="lista-cadastros" style="display:none;margin-top:15px;"></div>
+  <div id="tabela-cadastros"></div>
+
+  <hr style="margin:25px 0;border:0;border-top:1px solid #ccc;">
+
+  <!-- IMPORTAR CSV -->
+  <h3 style="color:#1b4332;margin-bottom:10px;">📥 Importar escolas de arquivo CSV</h3>
+  <input type="file" id="importCsv" accept=".csv" style="margin-bottom:10px;">
+  <div id="resultadoImport" style="font-size:0.9em;margin-top:8px;"></div>
+
+</div>
+
+<script>
+// ===== VER CADASTROS =====
+function abrirLista() {
+  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+  if (lista.length === 0) {
+    alert('Nenhum cadastro encontrado.');
+    return;
+  }
+  document.getElementById('lista-cadastros').style.display = 'block';
+  let html = '<table style="width:100%;border-collapse:collapse;margin-top:15px;">';
+  html += '<tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
+  lista.forEach(d => {
+    html += '<tr style="border-bottom:1px solid #ddd;">' +
+      '<td style="padding:8px;">' + d.tipo + '</td>' +
+      '<td style="padding:8px;">' + d.nome + '</td>' +
+      '<td style="padding:8px;">' + (d.telefone || '-') + '</td>' +
+      '<td style="padding:8px;">' + d.data + '</td>' +
+      '</tr>';
+  });
+  html += '</table>';
+  document.getElementById('tabela-cadastros').innerHTML = html;
+}
+
+// ===== IMPORTAR CSV =====
+document.getElementById('importCsv').addEventListener('change', function(e) {
+  const arquivo = e.target.files[0];
+  if (!arquivo) return;
+
+  const reader = new FileReader();
+     reader.onload = function(event) {
+    let conteudo = event.target.result;
+
+    // Remove BOM (caractere invisível) e quebras de linha do Windows
+    conteudo = conteudo.replace(/^\uFEFF/, '').replace(/\r/g, '');
+
+    const linhas = conteudo.split('\n');
+    const cadastros = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+    let importados = 0;
+    let erros = 0;
+
+    for (let i = 1; i < linhas.length; i++) {
+      let linha = linhas[i].trim();
+      if (!linha) continue;
+
+      const valores = linha.split(';');
+
+      // Verifica se tem pelo menos tipo e nome
+      if (valores.length < 2 || !valores[1]) {
+        erros++;
+        continue;
+      }
+
+      cadastros.push({
+        tipo: valores[0].trim() || 'Escola',
+        nome: valores[1].trim() || '',
+        endereco: (valores[2] || '').trim(),
+        telefone: (valores[3] || '').trim(),
+        email: (valores[4] || '').trim(),
+        responsavel: (valores[5] || '').trim(),
+        qtd_alunos: (valores[6] || '').trim(),
+        observacoes: (valores[7] || '').trim(),
+        data: new Date().toLocaleDateString('pt-BR')
+      });
+      importados++;
+    }
+
+    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
+
+    let msg = `✅ ${importados} escola(s) importada(s) com sucesso!`;
+    if (erros > 0) msg += `<br><span style="color:#856404;">⚠️ ${erros} linha(s) ignoradas por dados incompletos</span>`;
+
+    document.getElementById('resultadoImport').innerHTML =
+      `<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">${msg}</span>`;
+  };
+
+    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
+    document.getElementById('resultadoImport').innerHTML =
+      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
+      importados + ' escola(s) importada(s) com sucesso!</span>';
+  };
+    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
+    document.getElementById('resultadoImport').innerHTML =
+      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
+      importados + ' escola(s) importada(s) com sucesso!</span>';
+  };
+  reader.readAsText(arquivo, 'UTF-8');
+});
+</script>
+
+</body>
 </body>
 </html>
