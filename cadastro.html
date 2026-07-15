@@ -1,338 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Raízes do Amanhã</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f0f7f4; }
-        header { background: #2d6a4f; color: white; text-align: center; padding: 30px 20px; }
-        header h1 { font-size: 2em; }
-        header p { margin-top: 10px; opacity: 0.9; }
-        .container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
-        .tabs { display: flex; margin-bottom: 20px; gap: 10px; }
-        .tab { flex: 1; padding: 12px; text-align: center; background: #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .tab.ativo { background: #40916c; color: white; }
-        .formulario { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
-        .formulario.ativo { display: block; }
-        label { display: block; margin: 15px 0 5px; font-weight: bold; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; }
-        textarea { height: 80px; resize: vertical; }
-        .btn { background: #40916c; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1em; cursor: pointer; margin-top: 20px; width: 100%; }
-        .btn:hover { background: #2d6a4f; }
-        .voltar { display: inline-block; margin-top: 20px; color: #40916c; text-decoration: none; }
-        footer { text-align: center; padding: 30px; color: #666; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro - Raízes do Amanhã</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background: #f0f7f4; }
+
+header {
+  background: linear-gradient(135deg, #1b4332, #2d6a4f);
+  color: #fff; text-align: center; padding: 40px 20px;
+}
+header h1 { font-size: 2em; margin-bottom: 8px; }
+header p { font-size: 1.1em; opacity: 0.9; }
+
+.nav-bar {
+  background: #2d6a4f; display: flex; justify-content: center;
+  gap: 4px; padding: 10px 20px; flex-wrap: wrap;
+}
+.nav-bar a {
+  color: #fff; text-decoration: none; padding: 8px 20px;
+  border-radius: 6px; font-weight: 600; font-size: 0.95em;
+}
+.nav-bar a:hover, .nav-bar a.ativo { background: #1b4332; }
+
+.container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
+
+.tabs {
+  display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;
+}
+.tab {
+  background: #ddd; color: #555; border: none; padding: 12px 24px;
+  border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;
+}
+.tab.ativo { background: #2d6a4f; color: #fff; }
+
+.formulario { display: none; }
+.formulario.ativo { display: block; }
+
+.card {
+  background: #fff; border-radius: 12px; padding: 30px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.card h2 { color: #1b4332; margin-bottom: 20px; }
+
+label { display: block; margin-top: 15px; font-weight: 600; color: #333; }
+input, select, textarea {
+  width: 100%; padding: 10px 12px; margin-top: 5px; border: 1px solid #ccc;
+  border-radius: 6px; font-size: 1em; box-sizing: border-box;
+}
+textarea { min-height: 80px; }
+.btn {
+  display: inline-block; background: #2d6a4f; color: #fff;
+  padding: 12px 28px; border-radius: 8px; border: none; cursor: pointer;
+  font-weight: 600; font-size: 1em; margin-top: 20px;
+}
+.btn:hover { background: #1b4332; }
+
+.voltar {
+  display: block; text-align: center; margin-top: 30px;
+  color: #2d6a4f; font-weight: 600; text-decoration: none;
+}
+footer {
+  background: #1b4332; color: #aaa; text-align: center;
+  padding: 30px 20px; margin-top: 40px;
+}
+</style>
 </head>
-
 <body>
-    <header>
-    <h1>📋 Cadastro de Instituições</h1>
-    <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
-<div style="text-align:center;background:#2d6a4f;padding:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-    <a href="index.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;">🏠 Início</a>
-    <a href="cadastro.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;background:#1b4332;">📝 Cadastro</a>
-    <a href="feirinhas.html" style="color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;">🌽 Feirinhas</a>
-</div>
-    </header>
 
-    <div class="container">
-        <div class="tabs">
-            <div class="tab ativo" onclick="abrirTab('escola')">🏫 Escola</div>
-            <div class="tab" onclick="abrirTab('lar')">🏠 Lar de Idosos</div>
-            <div class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</div>
-        </div>
+<header>
+  <h1>📋 Cadastro de Instituições</h1>
+  <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
+</header>
 
-        <!-- FORMULÁRIO ESCOLA -->
-        <div id="form-escola" class="formulario ativo">
-            <h2>Cadastro de Escola</h2>
-            <label>Nome da Escola *</label>
-            <input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
-            <label>Endereço *</label>
-            <input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
-            <label>Telefone *</label>
-            <input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
-            <label>E-mail</label>
-            <input type="email" id="escola-email" placeholder="escola@exemplo.com">
-            <label>Responsável pelo Projeto *</label>
-            <input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor responsável">
-            <label>Quantidade estimada de alunos participantes</label>
-            <input type="number" id="escola-alunos" placeholder="Ex: 200">
-            <label>Possui espaço para horta? *</label>
-            <select id="escola-espaco">
-                <option>Selecione...</option>
-                <option>Sim, possui espaço disponível</option>
-                <option>Não, mas temos interesse</option>
-                <option>Precisamos avaliar</option>
-            </select>
-            <label>Observações</label>
-            <textarea id="escola-obs" placeholder="Informações adicionais..."></textarea>
-            <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
-        </div>
+<nav class="nav-bar">
+  <a href="index.html">🏠 Início</a>
+  <a href="cadastro.html" class="ativo">📝 Cadastro</a>
+  <a href="feirinhas.html">🌽 Feirinhas</a>
+</nav>
 
-        <!-- FORMULÁRIO LAR DE IDOSOS -->
-        <div id="form-lar" class="formulario">
-            <h2>Cadastro de Lar de Idosos</h2>
-            <label>Nome da Instituição *</label>
-            <input type="text" id="lar-nome" placeholder="Ex: Lar São Vicente de Paulo">
-            <label>Endereço *</label>
-            <input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
-            <label>Telefone *</label>
-            <input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
-            <label>E-mail</label>
-            <input type="email" id="lar-email" placeholder="contato@exemplo.com">
-            <label>Responsável *</label>
-            <input type="text" id="lar-responsavel" placeholder="Nome do responsável">
-            <label>Quantidade de idosos residentes</label>
-            <input type="number" id="lar-idosos" placeholder="Ex: 40">
-            <label>Observações</label>
-            <textarea id="lar-obs" placeholder="Informações adicionais..."></textarea>
-            <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Instituição</button>
-        </div>
+<div class="container">
+  <div class="tabs">
+    <button class="tab ativo" onclick="abrirTab('escola')">🏫 Escola</button>
+    <button class="tab" onclick="abrirTab('lar')">🏠 Lar de Idosos</button>
+    <button class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</button>
+  </div>
 
-        <!-- FORMULÁRIO VOLUNTÁRIO -->
-        <div id="form-voluntario" class="formulario">
-            <h2>Cadastro de Voluntário</h2>
-            <label>Nome Completo *</label>
-            <input type="text" id="vol-nome" placeholder="Seu nome">
-            <label>Telefone *</label>
-            <input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
-            <label>E-mail</label>
-            <input type="email" id="vol-email" placeholder="seu@email.com">
-            <label>Como deseja ajudar?</label>
-            <select id="vol-area">
-                <option>Selecione...</option>
-                <option>Cuidador de horta</option>
-                <option>Professor/Educador</option>
-                <option>Doação de materiais</option>
-                <option>Transporte/Logística</option>
-                <option>Divulgação/Comunicação</option>
-                <option>Outro</option>
-            </select>
-            <label>Disponibilidade</label>
-            <select id="vol-disponibilidade">
-                <option>Selecione...</option>
-                <option>Manhãs</option>
-                <option>Tardes</option>
-                <option>Finais de semana</option>
-                <option>Flexível</option>
-            </select>
-            <label>Mensagem</label>
-            <textarea id="vol-msg" placeholder="Conte um pouco sobre você..."></textarea>
-            <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
-        </div>
-
-        <div id="lista-cadastros" style="margin-top: 30px; display: none;">
-            <h2>📋 Instituições Cadastradas</h2>
-            <div id="tabela-cadastros"></div>
-        </div>
-
-        <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar para página inicial</a>
+  <!-- ESCOLA -->
+  <div id="form-escola" class="formulario ativo">
+    <div class="card">
+      <h2>Cadastro de Escola</h2>
+      <label>Nome da Escola *</label>
+      <input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
+      <label>Endereço *</label>
+      <input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
+      <label>Telefone *</label>
+      <input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label>
+      <input type="email" id="escola-email" placeholder="escola@exemplo.com">
+      <label>Responsável pelo Projeto *</label>
+      <input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">
+      <label>Quantidade de alunos</label>
+      <input type="number" id="escola-alunos" placeholder="Ex: 200">
+      <label>Possui espaço para horta? *</label>
+      <select id="escola-espaco">
+        <option>Selecione...</option>
+        <option>Sim, possui espaço disponível</option>
+        <option>Não, mas temos interesse</option>
+        <option>Precisamos avaliar</option>
+      </select>
+      <label>Observações</label>
+      <textarea id="escola-obs" placeholder="Informações adicionais..."></textarea>
+      <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
     </div>
+  </div>
 
-    <footer>
-        <p>2026 — Raízes do Amanhã | UNINTER — Ciência de Dados</p>
-        <p>Porto Alegre — Bairro Passo D'Areia, RS</p>
-    </footer>
+  <!-- LAR DE IDOSOS -->
+  <div id="form-lar" class="formulario">
+    <div class="card">
+      <h2>Cadastro de Lar de Idosos</h2>
+      <label>Nome da Instituição *</label>
+      <input type="text" id="lar-nome" placeholder="Nome do lar">
+      <label>Endereço *</label>
+      <input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
+      <label>Telefone *</label>
+      <input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label>
+      <input type="email" id="lar-email" placeholder="contato@exemplo.com">
+      <label>Responsável *</label>
+      <input type="text" id="lar-responsavel" placeholder="Nome do responsável">
+      <label>Quantidade de idosos</label>
+      <input type="number" id="lar-idosos" placeholder="Ex: 40">
+      <label>Possui espaço para horta?</label>
+      <select id="lar-espaco">
+        <option>Selecione...</option>
+        <option>Sim, possui espaço disponível</option>
+        <option>Não, mas temos interesse</option>
+        <option>Precisamos avaliar</option>
+      </select>
+      <label>Observações</label>
+      <textarea id="lar-obs" placeholder="Informações adicionais..."></textarea>
+      <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Lar</button>
+    </div>
+  </div>
 
-    <script>
-        function abrirTab(tipo) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
-            document.querySelectorAll('.formulario').forEach(f => f.classList.remove('ativo'));
-            if (tipo === 'escola') {
-                document.querySelectorAll('.tab')[0].classList.add('ativo');
-                document.getElementById('form-escola').classList.add('ativo');
-            } else if (tipo === 'lar') {
-                document.querySelectorAll('.tab')[1].classList.add('ativo');
-                document.getElementById('form-lar').classList.add('ativo');
-            } else {
-                document.querySelectorAll('.tab')[2].classList.add('ativo');
-                document.getElementById('form-voluntario').classList.add('ativo');
-            }
-        }
+  <!-- VOLUNTÁRIO -->
+  <div id="form-voluntario" class="formulario">
+    <div class="card">
+      <h2>Cadastro de Voluntário</h2>
+      <label>Nome Completo *</label>
+      <input type="text" id="vol-nome" placeholder="Seu nome">
+      <label>Telefone *</label>
+      <input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label>
+      <input type="email" id="vol-email" placeholder="seu@email.com">
+      <label>Área de interesse</label>
+      <select id="vol-area">
+        <option>Agricultura/Horta</option>
+        <option>Administrativo</option>
+        <option>Divulgação</option>
+        <option>Transporte</option>
+        <option>Flexível</option>
+      </select>
+      <label>Mensagem</label>
+      <textarea id="vol-msg" placeholder="Conte um pouco sobre você..."></textarea>
+      <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
+    </div>
+  </div>
 
-        function cadastrar(tipo) {
-            let dados = {};
-            if (tipo === 'escola') {
-                dados = {
-                    tipo: '🏫 Escola',
-                    nome: document.getElementById('escola-nome').value,
-                    endereco: document.getElementById('escola-endereco').value,
-                    telefone: document.getElementById('escola-telefone').value,
-                    responsavel: document.getElementById('escola-responsavel').value
-                };
-            } else if (tipo === 'lar') {
-                dados = {
-                    tipo: '🏠 Lar de Idosos',
-                    nome: document.getElementById('lar-nome').value,
-                    endereco: document.getElementById('lar-endereco').value,
-                    telefone: document.getElementById('lar-telefone').value,
-                    responsavel: document.getElementById('lar-responsavel').value
-                };
-            } else {
-                dados = {
-                    tipo: '🤝 Voluntário',
-                    nome: document.getElementById('vol-nome').value,
-                    telefone: document.getElementById('vol-telefone').value,
-                    area: document.getElementById('vol-area').value
-                };
-            }
+  <!-- VER CADASTROS E IMPORTAR CSV -->
+  <div style="text-align:center;margin-top:30px;">
+    <button onclick="abrirLista()" class="btn">📋 Ver cadastros</button>
+  </div>
 
-            if (!dados.nome) {
-                alert('Por favor, preencha o campo Nome.');
-                return;
-            }
+  <div id="lista-cadastros" style="display:none;margin-top:20px;">
+    <div class="card">
+      <h2>📋 Escolas Cadastradas</h2>
+      <div id="tabela-cadastros"></div>
+    </div>
+  </div>
 
-            let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-            dados.id = Date.now();
-            dados.data = new Date().toLocaleString('pt-BR');
-            lista.push(dados);
-            localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
-            alert('✅ Cadastro realizado com sucesso!');
-            abrirLista();
-        }
+  <hr style="margin:30px 0;border:0;border-top:1px solid #ccc;">
 
-        function abrirLista() {
-            let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-            if (lista.length === 0) return;
-            document.getElementById('lista-cadastros').style.display = 'block';
-            let html = '<table style="width:100%;border-collapse:collapse;margin-top:15px;">';
-            html += '<tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
-            lista.forEach(d => {
-                html += `<tr style="border-bottom:1px solid #ddd;">
-                    <td style="padding:8px">${d.tipo}</td>
-                    <td style="padding:8px">${d.nome}</td>
-                    <td style="padding:8px">${d.telefone || '-'}</td>
-                    <td style="padding:8px">${d.data}</td>
-                </tr>`;
-            });
-            html += '</table>';
-            document.getElementById('tabela-cadastros').innerHTML = html;
-        }
+  <div class="card" style="text-align:center;">
+    <h3 style="color:#1b4332;">📥 Importar escolas de arquivo CSV</h3>
+    <p style="color:#666;font-size:0.9em;margin-bottom:12px;">Selecione o arquivo escolas.csv</p>
+    <input type="file" id="importCsv" accept=".csv" style="display:inline-block;width:auto;">
+    <div id="resultadoImport" style="font-size:0.9em;margin-top:8px;"></div>
+  </div>
 
-        abrirLista();
-    </script>
-<!-- ===== SEÇÃO DE VISUALIZAÇÃO E IMPORT ===== -->
-<div style="max-width:600px;margin:30px auto;padding:20px;background:#f0f7f4;border-radius:10px;text-align:center;">
-
-  <!-- BOTÃO VER CADASTROS -->
-  <button onclick="abrirLista()" style="background:#2d6a4f;color:#fff;padding:12px 30px;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;margin-bottom:20px;">
-    📋 Ver cadastros
-  </button>
-
-  <div id="lista-cadastros" style="display:none;margin-top:15px;"></div>
-  <div id="tabela-cadastros"></div>
-
-  <hr style="margin:25px 0;border:0;border-top:1px solid #ccc;">
-
-  <!-- IMPORTAR CSV -->
-  <h3 style="color:#1b4332;margin-bottom:10px;">📥 Importar escolas de arquivo CSV</h3>
-  <input type="file" id="importCsv" accept=".csv" style="margin-bottom:10px;">
-  <div id="resultadoImport" style="font-size:0.9em;margin-top:8px;"></div>
-
+  <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
 </div>
 
+<footer>
+  <p><strong>🌿 Raízes do Amanhã</strong> — Sustentabilidade e Segurança Alimentar</p>
+  <p>Projeto de Extensão — UNINTER | Porto Alegre/RS</p>
+</footer>
+
 <script>
-// ===== VER CADASTROS =====
-function abrirLista() {
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  if (lista.length === 0) {
-    alert('Nenhum cadastro encontrado.');
-    return;
+function abrirTab(tipo) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+  document.querySelectorAll('.formulario').forEach(f => f.classList.remove('ativo'));
+  if (tipo === 'escola') { document.querySelectorAll('.tab')[0].classList.add('ativo'); document.getElementById('form-escola').classList.add('ativo'); }
+  else if (tipo === 'lar') { document.querySelectorAll('.tab')[1].classList.add('ativo'); document.getElementById('form-lar').classList.add('ativo'); }
+  else { document.querySelectorAll('.tab')[2].classList.add('ativo'); document.getElementById('form-voluntario').classList.add('ativo'); }
+}
+
+function cadastrar(tipo) {
+  let dados;
+  if (tipo === 'escola') {
+    dados = { tipo: '🏫 Escola', nome: document.getElementById('escola-nome').value, endereco: document.getElementById('escola-endereco').value, telefone: document.getElementById('escola-telefone').value, email: document.getElementById('escola-email').value, responsavel: document.getElementById('escola-responsavel').value, qtd_alunos: document.getElementById('escola-alunos').value, espaco_horta: document.getElementById('escola-espaco').value, observacoes: document.getElementById('escola-obs').value };
+  } else if (tipo === 'lar') {
+    dados = { tipo: '🏠 Lar de Idosos', nome: document.getElementById('lar-nome').value, endereco: document.getElementById('lar-endereco').value, telefone: document.getElementById('lar-telefone').value, email: document.getElementById('lar-email').value, responsavel: document.getElementById('lar-responsavel').value, qtd_idosos: document.getElementById('lar-idosos').value, espaco_horta: document.getElementById('lar-espaco').value, observacoes: document.getElementById('lar-obs').value };
+  } else {
+    dados = { tipo: '🤝 Voluntário', nome: document.getElementById('vol-nome').value, telefone: document.getElementById('vol-telefone').value, email: document.getElementById('vol-email').value, area: document.getElementById('vol-area').value, mensagem: document.getElementById('vol-msg').value };
   }
-  document.getElementById('lista-cadastros').style.display = 'block';
-  let html = '<table style="width:100%;border-collapse:collapse;margin-top:15px;">';
-  html += '<tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
-  lista.forEach(d => {
-    html += '<tr style="border-bottom:1px solid #ddd;">' +
-      '<td style="padding:8px;">' + d.tipo + '</td>' +
-      '<td style="padding:8px;">' + d.nome + '</td>' +
-      '<td style="padding:8px;">' + (d.telefone || '-') + '</td>' +
-      '<td style="padding:8px;">' + d.data + '</td>' +
-      '</tr>';
-  });
-  html += '</table>';
-  document.getElementById('tabela-cadastros').innerHTML = html;
+  if (!dados.nome) { alert('Preencha o campo Nome.'); return; }
+  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+  dados.id = Date.now();
+  dados.data = new Date().toLocaleDateString('pt-BR');
+  lista.push(dados);
+  localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
+  alert('✅ Cadastro realizado!');
+  abrirLista();
 }
 
-// ===== IMPORTAR CSV =====
-<script>
 function abrirLista() {
   let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  if (lista.length === 0) { alert('Nenhum cadastro encontrado.'); return; }
+  if (lista.length === 0) { alert('Nenhum cadastro ainda.'); return; }
   document.getElementById('lista-cadastros').style.display = 'block';
-  let html = '<table style="width:100%;border-collapse:collapse;margin-top:15px;">';
-  html += '<tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
+  let html = '<table style="width:100%;border-collapse:collapse;"><tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
   lista.forEach(d => {
-    html += '<tr style="border-bottom:1px solid #ddd;">' +
-      '<td style="padding:8px;">' + (d.tipo || '') + '</td>' +
-      '<td style="padding:8px;">' + (d.nome || '') + '</td>' +
-      '<td style="padding:8px;">' + (d.telefone || '-') + '</td>' +
-      '<td style="padding:8px;">' + (d.data || '') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid #ddd;"><td style="padding:8px;">' + (d.tipo||'') + '</td><td style="padding:8px;">' + (d.nome||'') + '</td><td style="padding:8px;">' + (d.telefone||'-') + '</td><td style="padding:8px;">' + (d.data||'') + '</td></tr>';
   });
   html += '</table>';
   document.getElementById('tabela-cadastros').innerHTML = html;
 }
 
-// ===== IMPORTAR CSV =====
-document.getElementById('importCsv').addEventListener('change', function(e) {
+// ===== IMPORTAR EXCEL =====
+document.getElementById('importExcel').addEventListener('change', function(e) {
   const arquivo = e.target.files[0];
   if (!arquivo) return;
 
   const reader = new FileReader();
   reader.onload = function(event) {
-    let conteudo = event.target.result;
+    try {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const primeiraAba = workbook.SheetNames[0];
+      const planilha = workbook.Sheets[primeiraAba];
+      const linhas = XLSX.utils.sheet_to_json(planilha, { header: 1 });
 
-    // Remove BOM e quebras de linha do Windows
-    conteudo = conteudo.replace(/^\uFEFF/, '').replace(/\r/g, '');
+      const cadastros = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+      let importados = 0, erros = 0;
 
-    const linhas = conteudo.split('\n');
-    const cadastros = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-    let importados = 0;
-    let erros = 0;
+      for (let i = 1; i < linhas.length; i++) {
+        const valores = linhas[i];
+        if (!valores || valores.length < 2 || !valores[1]) { erros++; continue; }
 
-    for (let i = 1; i < linhas.length; i++) {
-      let linha = linhas[i].trim();
-      if (!linha) continue;
-
-      // Remove aspas duplas extras do começo e fim da linha, se houver
-      linha = linha.replace(/^"/, '').replace(/"$/, '');
-
-      const valores = linha.split(';');
-
-      if (valores.length < 2 || !valores[1]) {
-        erros++;
-        continue;
+        cadastros.push({
+          tipo: String(valores[0] || 'Escola').trim(),
+          nome: String(valores[1] || '').trim(),
+          endereco: String(valores[2] || '').trim(),
+          telefone: String(valores[3] || '').trim(),
+          email: String(valores[4] || '').trim(),
+          responsavel: String(valores[5] || '').trim(),
+          qtd_alunos: String(valores[6] || '').trim(),
+          observacoes: String(valores[7] || '').trim(),
+          data: new Date().toLocaleDateString('pt-BR')
+        });
+        importados++;
       }
 
-      cadastros.push({
-        tipo: valores[0].trim(),
-        nome: valores[1].trim(),
-        endereco: (valores[2] || '').trim(),
-        telefone: (valores[3] || '').trim(),
-        email: (valores[4] || '').trim(),
-        responsavel: (valores[5] || '').trim(),
-        qtd_alunos: (valores[6] || '').trim(),
-        observacoes: (valores[7] || '').trim(),
-        data: new Date().toLocaleDateString('pt-BR')
-      });
-      importados++;
+      localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
+
+      const msg = '✅ ' + importados + ' escola(s) importada(s)' +
+        (erros > 0 ? '. ⚠️ ' + erros + ' linha(s) ignoradas' : '');
+
+      document.getElementById('resultadoImport').innerHTML =
+        '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">' + msg + '</span>';
+
+    } catch (err) {
+      document.getElementById('resultadoImport').innerHTML =
+        '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600;">❌ Erro ao ler arquivo. Verifique se é um .xlsx válido.</span>';
     }
-
-    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
-
-    let msg = '✅ ' + importados + ' escola(s) importada(s) com sucesso!';
-    if (erros > 0) msg += '<br>⚠️ ' + erros + ' linha(s) ignoradas';
-
-    document.getElementById('resultadoImport').innerHTML =
-      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">' + msg + '</span>';
   };
-  reader.readAsText(arquivo, 'UTF-8');
+  reader.readAsArrayBuffer(arquivo);
 });
 </script>
-</script>
 
-</body>
 </body>
 </html>
