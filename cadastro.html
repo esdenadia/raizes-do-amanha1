@@ -68,6 +68,7 @@ footer {
 }
 </style>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <body>
 
 <header>
@@ -170,7 +171,7 @@ footer {
     </div>
   </div>
 
-  <!-- VER CADASTROS E IMPORTAR CSV -->
+  <!-- VER CADASTROS E IMPORTAR excel -->
   <div style="text-align:center;margin-top:30px;">
     <button onclick="abrirLista()" class="btn">📋 Ver cadastros</button>
   </div>
@@ -185,9 +186,9 @@ footer {
   <hr style="margin:30px 0;border:0;border-top:1px solid #ccc;">
 
   <div class="card" style="text-align:center;">
-    <h3 style="color:#1b4332;">📥 Importar escolas de arquivo CSV</h3>
-    <p style="color:#666;font-size:0.9em;margin-bottom:12px;">Selecione o arquivo escolas.csv</p>
-    <input type="file" id="importCsv" accept=".csv" style="display:inline-block;width:auto;">
+    <h3 style="color:#1b4332;">📥 Importar escolas de arquivo EXCEL</h3>
+    <p style="color:#666;font-size:0.9em;margin-bottom:12px;">Selecione o arquivo <escolas class="xlsx">escolas.xlsx</escolas></p>
+    <input type="file" id="importExcel" accept=".xlsx" style="display:inline-block;width:auto;">
     <div id="resultadoImport" style="font-size:0.9em;margin-top:8px;"></div>
   </div>
 
@@ -231,12 +232,44 @@ function abrirLista() {
   let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
   if (lista.length === 0) { alert('Nenhum cadastro ainda.'); return; }
   document.getElementById('lista-cadastros').style.display = 'block';
-  let html = '<table style="width:100%;border-collapse:collapse;"><tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
+  let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.9em;">';
+  html += '<tr style="background:#2d6a4f;color:white;">' +
+    '<th style="padding:8px;">Tipo</th>' +
+    '<th style="padding:8px;">Nome</th>' +
+    '<th style="padding:8px;">Endereço</th>' +
+    '<th style="padding:8px;">Telefone</th>' +
+    '<th style="padding:8px;">E-mail</th>' +
+    '<th style="padding:8px;">Responsável</th>' +
+    '<th style="padding:8px;text-align:center;">Alunos</th>' +
+    '<th style="padding:8px;">Obs</th>' +
+    '<th style="padding:8px;">Data</th>' +
+    '<th style="padding:8px;text-align:center;">Ações</th>' +
+    '</tr>';
   lista.forEach(d => {
-    html += '<tr style="border-bottom:1px solid #ddd;"><td style="padding:8px;">' + (d.tipo||'') + '</td><td style="padding:8px;">' + (d.nome||'') + '</td><td style="padding:8px;">' + (d.telefone||'-') + '</td><td style="padding:8px;">' + (d.data||'') + '</td></tr>';
+    html += '<tr style="border-bottom:1px solid #ddd;">' +
+      '<td style="padding:8px;">' + (d.tipo||'') + '</td>' +
+      '<td style="padding:8px;"><strong>' + (d.nome||'') + '</strong></td>' +
+      '<td style="padding:8px;">' + (d.endereco||'-') + '</td>' +
+      '<td style="padding:8px;">' + (d.telefone||'-') + '</td>' +
+      '<td style="padding:8px;">' + (d.email||'-') + '</td>' +
+      '<td style="padding:8px;">' + (d.responsavel||'-') + '</td>' +
+      '<td style="padding:8px;text-align:center;">' + (d.qtd_alunos||'-') + '</td>' +
+      '<td style="padding:8px;">' + (d.observacoes||'-') + '</td>' +
+      '<td style="padding:8px;">' + (d.data||'') + '</td>' +
+      '<td style="padding:8px;text-align:center;">' +
+      '<button onclick="excluirCadastro(' + d.id + ')" style="background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:0.85em;">🗑️</button>' +
+      '</td></tr>';
   });
-  html += '</table>';
+  html += '</table></div>';
   document.getElementById('tabela-cadastros').innerHTML = html;
+}
+// ===== EXCLUIR CADASTRO =====
+function excluirCadastro(id) {
+  if (!confirm('Tem certeza que deseja excluir este cadastro?')) return;
+  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+  lista = lista.filter(d => d.id !== id);
+  localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
+  abrirLista();
 }
 
 // ===== IMPORTAR EXCEL =====
@@ -261,34 +294,42 @@ document.getElementById('importExcel').addEventListener('change', function(e) {
         if (!valores || valores.length < 2 || !valores[1]) { erros++; continue; }
 
         cadastros.push({
-          tipo: String(valores[0] || 'Escola').trim(),
-          nome: String(valores[1] || '').trim(),
-          endereco: String(valores[2] || '').trim(),
-          telefone: String(valores[3] || '').trim(),
-          email: String(valores[4] || '').trim(),
-          responsavel: String(valores[5] || '').trim(),
-          qtd_alunos: String(valores[6] || '').trim(),
-          observacoes: String(valores[7] || '').trim(),
-          data: new Date().toLocaleDateString('pt-BR')
-        });
+            tipo: String(valores[0] || 'Escola').trim(),
+            nome: String(valores[1] || '').trim(),
+            endereco: String(valores[2] || '').trim(),
+            telefone: String(valores[3] || '').trim(),
+            email: String(valores[4] || '').trim(),
+            responsavel: String(valores[5] || '').trim(),
+            qtd_alunos: String(valores[6] || '').trim(),
+            observacoes: String(valores[7] || '').trim(),
+            data: new Date().toLocaleDateString('pt-BR'),
+            id: Date.now() + i
+});
+      }
+
+      localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
+      document.getElementById('resultadoImport').innerHTML =
+        '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
+        importados + ' escola(s) importada(s)' +
+        (erros > 0 ? '. ⚠️ ' + erros + ' linha(s) ignoradas' : '') + '</span>';
+    } catch (err) {
+      document.getElementById('resultadoImport').innerHTML =
         importados++;
       }
 
       localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
-
-      const msg = '✅ ' + importados + ' escola(s) importada(s)' +
-        (erros > 0 ? '. ⚠️ ' + erros + ' linha(s) ignoradas' : '');
-
       document.getElementById('resultadoImport').innerHTML =
-        '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">' + msg + '</span>';
-
+        '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
+        importados + ' escola(s) importada(s)' +
+        (erros > 0 ? '. ⚠️ ' + erros + ' linha(s) ignoradas' : '') + '</span>';
     } catch (err) {
       document.getElementById('resultadoImport').innerHTML =
-        '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600;">❌ Erro ao ler arquivo. Verifique se é um .xlsx válido.</span>';
+        '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600;">❌ Erro ao ler. Verifique se é .xlsx válido.</span>';
     }
   };
   reader.readAsArrayBuffer(arquivo);
 });
+
 </script>
 
 </body>
