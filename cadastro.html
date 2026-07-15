@@ -257,15 +257,34 @@ function abrirLista() {
 }
 
 // ===== IMPORTAR CSV =====
+<script>
+function abrirLista() {
+  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
+  if (lista.length === 0) { alert('Nenhum cadastro encontrado.'); return; }
+  document.getElementById('lista-cadastros').style.display = 'block';
+  let html = '<table style="width:100%;border-collapse:collapse;margin-top:15px;">';
+  html += '<tr style="background:#2d6a4f;color:white;"><th>Tipo</th><th>Nome</th><th>Contato</th><th>Data</th></tr>';
+  lista.forEach(d => {
+    html += '<tr style="border-bottom:1px solid #ddd;">' +
+      '<td style="padding:8px;">' + (d.tipo || '') + '</td>' +
+      '<td style="padding:8px;">' + (d.nome || '') + '</td>' +
+      '<td style="padding:8px;">' + (d.telefone || '-') + '</td>' +
+      '<td style="padding:8px;">' + (d.data || '') + '</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById('tabela-cadastros').innerHTML = html;
+}
+
+// ===== IMPORTAR CSV =====
 document.getElementById('importCsv').addEventListener('change', function(e) {
   const arquivo = e.target.files[0];
   if (!arquivo) return;
 
   const reader = new FileReader();
-     reader.onload = function(event) {
+  reader.onload = function(event) {
     let conteudo = event.target.result;
 
-    // Remove BOM (caractere invisível) e quebras de linha do Windows
+    // Remove BOM e quebras de linha do Windows
     conteudo = conteudo.replace(/^\uFEFF/, '').replace(/\r/g, '');
 
     const linhas = conteudo.split('\n');
@@ -277,17 +296,19 @@ document.getElementById('importCsv').addEventListener('change', function(e) {
       let linha = linhas[i].trim();
       if (!linha) continue;
 
+      // Remove aspas duplas extras do começo e fim da linha, se houver
+      linha = linha.replace(/^"/, '').replace(/"$/, '');
+
       const valores = linha.split(';');
 
-      // Verifica se tem pelo menos tipo e nome
       if (valores.length < 2 || !valores[1]) {
         erros++;
         continue;
       }
 
       cadastros.push({
-        tipo: valores[0].trim() || 'Escola',
-        nome: valores[1].trim() || '',
+        tipo: valores[0].trim(),
+        nome: valores[1].trim(),
         endereco: (valores[2] || '').trim(),
         telefone: (valores[3] || '').trim(),
         email: (valores[4] || '').trim(),
@@ -301,25 +322,15 @@ document.getElementById('importCsv').addEventListener('change', function(e) {
 
     localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
 
-    let msg = `✅ ${importados} escola(s) importada(s) com sucesso!`;
-    if (erros > 0) msg += `<br><span style="color:#856404;">⚠️ ${erros} linha(s) ignoradas por dados incompletos</span>`;
+    let msg = '✅ ' + importados + ' escola(s) importada(s) com sucesso!';
+    if (erros > 0) msg += '<br>⚠️ ' + erros + ' linha(s) ignoradas';
 
     document.getElementById('resultadoImport').innerHTML =
-      `<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">${msg}</span>`;
-  };
-
-    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
-    document.getElementById('resultadoImport').innerHTML =
-      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
-      importados + ' escola(s) importada(s) com sucesso!</span>';
-  };
-    localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
-    document.getElementById('resultadoImport').innerHTML =
-      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' +
-      importados + ' escola(s) importada(s) com sucesso!</span>';
+      '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">' + msg + '</span>';
   };
   reader.readAsText(arquivo, 'UTF-8');
 });
+</script>
 </script>
 
 </body>
