@@ -6,96 +6,55 @@
 <title>Cadastro - Raízes do Amanhã</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-body { background: #f0f7f4; }
-
-header {
-  background: linear-gradient(135deg, #1b4332, #2d6a4f);
-  color: #fff; text-align: center; padding: 30px 20px;
-}
-header h1 { font-size: 2em; margin-bottom: 8px; }
-header p { font-size: 1.1em; opacity: 0.9; }
-
-.nav-bar {
-  background: #2d6a4f; display: flex; justify-content: center;
-  gap: 4px; padding: 10px 20px; flex-wrap: wrap;
-}
-.nav-bar a {
-  color: #fff; text-decoration: none; padding: 8px 20px;
-  border-radius: 6px; font-weight: 600; font-size: 0.95em;
-}
-.nav-bar a:hover, .nav-bar a.ativo { background: #1b4332; }
-
-#area-usuario {
-  background: #1b4332; display: flex; justify-content: flex-end;
-  align-items: center; padding: 5px 20px; gap: 10px; flex-wrap: wrap;
-}
-#area-usuario span { color: #fff; font-size: 0.9em; }
-#area-usuario button {
-  background: transparent; color: #ffd700; border: 1px solid #ffd700;
-  padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em;
-}
-#area-usuario button:hover { background: #ffd700; color: #1b4332; }
-
-.container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
-.tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-.tab {
-  background: #ddd; color: #555; border: none; padding: 12px 24px;
-  border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;
-}
-.tab.ativo { background: #2d6a4f; color: #fff; }
-.formulario { display: none; }
-.formulario.ativo { display: block; }
-.card {
-  background: #fff; border-radius: 12px; padding: 30px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-.card h2 { color: #1b4332; margin-bottom: 20px; }
-label { display: block; margin-top: 15px; font-weight: 600; color: #333; }
-input, select, textarea {
-  width: 100%; padding: 10px 12px; margin-top: 5px; border: 1px solid #ccc;
-  border-radius: 6px; font-size: 1em; box-sizing: border-box;
-}
-textarea { min-height: 80px; }
-.btn {
-  display: inline-block; background: #2d6a4f; color: #fff;
-  padding: 12px 28px; border-radius: 8px; border: none; cursor: pointer;
-  font-weight: 600; font-size: 1em; margin-top: 20px;
-}
-.btn:hover { background: #1b4332; }
-.btn-sm { padding: 4px 12px; font-size: 0.85em; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-.btn-edit { background: #f39c12; color: #fff; }
-.btn-edit:hover { background: #d68910; }
-.btn-danger { background: #c0392b; color: #fff; }
-.btn-danger:hover { background: #962d22; }
-.btn-success { background: #27ae60; color: #fff; }
-.btn-success:hover { background: #1e8449; }
-.btn-warning { background: #e67e22; color: #fff; }
-.btn-warning:hover { background: #ca6f1e; }
-
-.voltar { display: block; text-align: center; margin-top: 30px; color: #2d6a4f; font-weight: 600; text-decoration: none; }
-footer { background: #1b4332; color: #aaa; text-align: center; padding: 30px 20px; margin-top: 40px; }
-
-.modal-overlay {
-  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-}
-.modal-overlay.ativo { display: flex; }
-.modal {
-  background: #fff; border-radius: 12px; padding: 30px; width: 90%; max-width: 420px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-.modal h2 { color: #1b4332; margin-bottom: 20px; text-align: center; }
-.modal input { margin-bottom: 10px; }
-.modal .btn { width: 100%; margin-top: 10px; }
-.modal p { text-align: center; margin-top: 15px; font-size: 0.9em; }
-.modal p a { color: #2d6a4f; font-weight: 600; cursor: pointer; }
-.modal .erro { color: #c0392b; text-align: center; font-size: 0.9em; margin-top: 10px; }
-
-.status-pendente { color: #e67e22; font-weight: 600; font-size: 0.85em; }
-.status-aprovado { color: #27ae60; font-weight: 600; font-size: 0.85em; }
-.status-rejeitado { color: #c0392b; font-weight: 600; font-size: 0.85em; }
-.aviso-admin { background: #fff3cd; color: #856404; padding: 12px 16px; border-radius: 8px; text-align: center; font-weight: 600; margin: 15px 0; border: 1px solid #ffc107; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f0f7f4}
+header{background:linear-gradient(135deg,#1b4332,#2d6a4f);color:#fff;text-align:center;padding:30px 20px}
+header h1{font-size:2em;margin-bottom:8px}
+header p{font-size:1.1em;opacity:.9}
+.nav-bar{background:#2d6a4f;display:flex;justify-content:center;gap:4px;padding:10px 20px;flex-wrap:wrap}
+.nav-bar a{color:#fff;text-decoration:none;padding:8px 20px;border-radius:6px;font-weight:600;font-size:.95em}
+.nav-bar a:hover,.nav-bar a.ativo{background:#1b4332}
+#area-usuario{background:#1b4332;display:flex;justify-content:flex-end;align-items:center;padding:5px 20px;gap:10px;flex-wrap:wrap}
+#area-usuario span{color:#fff;font-size:.9em}
+#area-usuario button{background:transparent;color:#ffd700;border:1px solid #ffd700;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.85em}
+#area-usuario button:hover{background:#ffd700;color:#1b4332}
+.container{max-width:700px;margin:30px auto;padding:0 20px}
+.tabs{display:flex;justify-content:center;gap:10px;margin:20px 0;flex-wrap:wrap}
+.tab{background:#ddd;color:#555;border:none;padding:12px 24px;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer}
+.tab.ativo{background:#2d6a4f;color:#fff}
+.formulario{display:none}
+.formulario.ativo{display:block}
+.card{background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.card h2{color:#1b4332;margin-bottom:20px}
+label{display:block;margin-top:15px;font-weight:600;color:#333}
+input,select,textarea{width:100%;padding:10px 12px;margin-top:5px;border:1px solid #ccc;border-radius:6px;font-size:1em;box-sizing:border-box}
+textarea{min-height:80px}
+.btn{display:inline-block;background:#2d6a4f;color:#fff;padding:12px 28px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:1em;margin-top:20px}
+.btn:hover{background:#1b4332}
+.btn-sm{padding:4px 12px;font-size:.85em;border:none;border-radius:4px;cursor:pointer;font-weight:600}
+.btn-edit{background:#f39c12;color:#fff}
+.btn-edit:hover{background:#d68910}
+.btn-danger{background:#c0392b;color:#fff}
+.btn-danger:hover{background:#962d22}
+.btn-success{background:#27ae60;color:#fff}
+.btn-success:hover{background:#1e8449}
+.btn-warning{background:#e67e22;color:#fff}
+.btn-warning:hover{background:#ca6f1e}
+.voltar{display:block;text-align:center;margin-top:30px;color:#2d6a4f;font-weight:600;text-decoration:none}
+footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-top:40px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.ativo{display:flex}
+.modal{background:#fff;border-radius:12px;padding:30px;width:90%;max-width:420px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.modal h2{color:#1b4332;margin-bottom:20px;text-align:center}
+.modal input{margin-bottom:10px}
+.modal .btn{width:100%;margin-top:10px}
+.modal p{text-align:center;margin-top:15px;font-size:.9em}
+.modal p a{color:#2d6a4f;font-weight:600;cursor:pointer}
+.modal .erro{color:#c0392b;text-align:center;font-size:.9em;margin-top:10px}
+.status-pendente{color:#e67e22;font-weight:600;font-size:.85em}
+.status-aprovado{color:#27ae60;font-weight:600;font-size:.85em}
+.status-rejeitado{color:#c0392b;font-weight:600;font-size:.85em}
+.aviso-admin{background:#fff3cd;color:#856404;padding:12px 16px;border-radius:8px;text-align:center;font-weight:600;margin:15px 0;border:1px solid #ffc107}
 </style>
 </head>
 <body>
@@ -120,114 +79,67 @@ footer { background: #1b4332; color: #aaa; text-align: center; padding: 30px 20p
     <button class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</button>
   </div>
 
-  <!-- ESCOLA -->
   <div id="form-escola" class="formulario ativo">
     <div class="card">
       <h2>Cadastro de Escola</h2>
-      <label>Nome da Escola *</label>
-      <input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
-      <label>Endereço *</label>
-      <input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
-      <label>Telefone *</label>
-      <input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label>
-      <input type="email" id="escola-email" placeholder="escola@exemplo.com">
-      <label>Responsável pelo Projeto *</label>
-      <input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">
-      <label>Quantidade de alunos</label>
-      <input type="number" id="escola-alunos" placeholder="Ex: 200">
-      <label>Possui espaço para horta? *</label>
-      <select id="escola-espaco">
-        <option>Selecione...</option>
-        <option>Sim, possui espaço disponível</option>
-        <option>Não, mas temos interesse</option>
-        <option>Precisamos avaliar</option>
-      </select>
-      <label>Observações</label>
-      <textarea id="escola-obs" placeholder="Informações adicionais..."></textarea>
+      <label>Nome da Escola *</label><input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
+      <label>Endereço *</label><input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
+      <label>Telefone *</label><input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label><input type="email" id="escola-email" placeholder="escola@exemplo.com">
+      <label>Responsável *</label><input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">
+      <label>Qtd alunos</label><input type="number" id="escola-alunos" placeholder="Ex: 200">
+      <label>Espaço para horta?</label>
+      <select id="escola-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
+      <label>Observações</label><textarea id="escola-obs"></textarea>
       <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
     </div>
   </div>
 
-  <!-- LAR DE IDOSOS -->
   <div id="form-lar" class="formulario">
     <div class="card">
       <h2>Cadastro de Lar de Idosos</h2>
-      <label>Nome da Instituição *</label>
-      <input type="text" id="lar-nome" placeholder="Nome do lar">
-      <label>Endereço *</label>
-      <input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
-      <label>Telefone *</label>
-      <input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label>
-      <input type="email" id="lar-email" placeholder="contato@exemplo.com">
-      <label>Responsável *</label>
-      <input type="text" id="lar-responsavel" placeholder="Nome do responsável">
-      <label>Quantidade de idosos</label>
-      <input type="number" id="lar-idosos" placeholder="Ex: 40">
-      <label>Possui espaço para horta?</label>
-      <select id="lar-espaco">
-        <option>Selecione...</option>
-        <option>Sim, possui espaço disponível</option>
-        <option>Não, mas temos interesse</option>
-        <option>Precisamos avaliar</option>
-      </select>
-      <label>Observações</label>
-      <textarea id="lar-obs" placeholder="Informações adicionais..."></textarea>
+      <label>Nome *</label><input type="text" id="lar-nome" placeholder="Nome do lar">
+      <label>Endereço *</label><input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
+      <label>Telefone *</label><input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label><input type="email" id="lar-email" placeholder="contato@exemplo.com">
+      <label>Responsável *</label><input type="text" id="lar-responsavel" placeholder="Nome do responsável">
+      <label>Qtd idosos</label><input type="number" id="lar-idosos" placeholder="Ex: 40">
+      <label>Espaço para horta?</label>
+      <select id="lar-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
+      <label>Observações</label><textarea id="lar-obs"></textarea>
       <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Lar</button>
     </div>
   </div>
 
-  <!-- VOLUNTÁRIO -->
   <div id="form-voluntario" class="formulario">
     <div class="card">
       <h2>Cadastro de Voluntário</h2>
-      <label>Nome Completo *</label>
-      <input type="text" id="vol-nome" placeholder="Seu nome">
-      <label>Telefone *</label>
-      <input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label>
-      <input type="email" id="vol-email" placeholder="seu@email.com">
-      <label>Área de interesse</label>
-      <select id="vol-area">
-        <option>Agricultura/Horta</option>
-        <option>Administrativo</option>
-        <option>Divulgação</option>
-        <option>Transporte</option>
-        <option>Flexível</option>
-      </select>
-      <label>Mensagem</label>
-      <textarea id="vol-msg" placeholder="Conte um pouco sobre você..."></textarea>
+      <label>Nome Completo *</label><input type="text" id="vol-nome" placeholder="Seu nome">
+      <label>Telefone *</label><input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
+      <label>E-mail</label><input type="email" id="vol-email" placeholder="seu@email.com">
+      <label>Área</label>
+      <select id="vol-area"><option>Agricultura/Horta</option><option>Administrativo</option><option>Divulgação</option><option>Transporte</option><option>Flexível</option></select>
+      <label>Mensagem</label><textarea id="vol-msg"></textarea>
       <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
     </div>
   </div>
 
-  <!-- AVISO -->
-  <div id="aviso-pendente" class="aviso-admin" style="display:none;">
-    ⏳ Seu cadastro foi enviado e aguarda aprovação do administrador.
-  </div>
+  <div id="aviso-pendente" class="aviso-admin" style="display:none">⏳ Cadastro enviado e aguarda aprovação do administrador.</div>
 
-  <!-- BOTÃO VER CADASTROS -->
-  <div style="text-align:center;margin-top:30px;">
+  <div style="text-align:center;margin-top:30px">
     <button onclick="abrirLista()" class="btn">📋 Ver cadastros</button>
   </div>
-
-  <div id="lista-cadastros" style="display:none;margin-top:20px;">
-    <div class="card">
-      <h2>📋 Cadastros</h2>
-      <div id="tabela-cadastros"></div>
-    </div>
+  <div id="lista-cadastros" style="display:none;margin-top:20px">
+    <div class="card"><h2>📋 Cadastros</h2><div id="tabela-cadastros"></div></div>
   </div>
 
-  <hr style="margin:30px 0;border:0;border-top:1px solid #ccc;">
+  <hr style="margin:30px 0;border:0;border-top:1px solid #ccc">
 
-  <!-- IMPORTAR EXCEL -->
-  <div class="card" style="text-align:center;">
-    <h3 style="color:#1b4332;">📥 Importar escolas de arquivo Excel</h3>
-    <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto;">
-    <div id="resultadoImport" style="font-size:0.9em;margin-top:8px;"></div>
+  <div class="card" style="text-align:center">
+    <h3 style="color:#1b4332">📥 Importar escolas de arquivo Excel</h3>
+    <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto">
+    <div id="resultadoImport" style="font-size:.9em;margin-top:8px"></div>
   </div>
-
   <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
 </div>
 
@@ -236,313 +148,171 @@ footer { background: #1b4332; color: #aaa; text-align: center; padding: 30px 20p
   <p>Projeto de Extensão — UNINTER | Porto Alegre/RS</p>
 </footer>
 
-<!-- MODAL LOGIN -->
 <div class="modal-overlay" id="modal-login">
   <div class="modal">
     <h2>🔐 Entrar</h2>
     <div id="form-login">
-      <label>E-mail</label>
-      <input type="email" id="login-email" placeholder="seu@email.com">
-      <label>Senha</label>
-      <input type="password" id="login-senha" placeholder="Sua senha">
+      <label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com">
+      <label>Senha</label><input type="password" id="login-senha" placeholder="Sua senha">
       <button class="btn" onclick="fazerLogin()">Entrar</button>
       <p>Não tem conta? <a onclick="mostrarCadastroUser()">Criar conta</a></p>
       <div id="erro-login" class="erro"></div>
     </div>
-    <div id="form-cadastro-user" style="display:none;">
-      <label>Nome</label>
-      <input type="text" id="cad-user-nome" placeholder="Seu nome">
-      <label>E-mail</label>
-      <input type="email" id="cad-user-email" placeholder="seu@email.com">
-      <label>Senha</label>
-      <input type="password" id="cad-user-senha" placeholder="Mínimo 4 caracteres">
+    <div id="form-cadastro-user" style="display:none">
+      <label>Nome</label><input type="text" id="cad-user-nome" placeholder="Seu nome">
+      <label>E-mail</label><input type="email" id="cad-user-email" placeholder="seu@email.com">
+      <label>Senha</label><input type="password" id="cad-user-senha" placeholder="Mínimo 4 caracteres">
       <button class="btn" onclick="criarUsuario()">Criar conta</button>
       <p>Já tem conta? <a onclick="mostrarLogin()">Fazer login</a></p>
       <div id="erro-cadastro" class="erro"></div>
     </div>
-    <div id="form-admin-setup" style="display:none;">
-      <p style="text-align:center;margin-bottom:15px;">Primeiro acesso. Crie o administrador:</p>
-      <label>Nome</label>
-      <input type="text" id="setup-nome" placeholder="Admin">
-      <label>E-mail</label>
-      <input type="email" id="setup-email" value="admin@raizes.com">
-      <label>Senha</label>
-      <input type="password" id="setup-senha" placeholder="Sua senha de admin">
+    <div id="form-admin-setup" style="display:none">
+      <p style="text-align:center;margin-bottom:15px">Primeiro acesso. Crie o administrador:</p>
+      <label>Nome</label><input type="text" id="setup-nome" placeholder="Admin">
+      <label>E-mail</label><input type="email" id="setup-email" value="admin@raizes.com">
+      <label>Senha</label><input type="password" id="setup-senha" placeholder="Mínimo 4 caracteres">
       <button class="btn" onclick="criarAdmin()">Criar administrador</button>
       <div id="erro-setup" class="erro"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL EDITAR -->
 <div class="modal-overlay" id="modal-editar">
-  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto;">
+  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
     <h2>✏️ Editar Cadastro</h2>
     <div id="form-editar"></div>
   </div>
 </div>
 
 <script>
-let usuarioLogado = JSON.parse(localStorage.getItem('raizes-sessao') || 'null');
-let editandoId = null;
+let usuarioLogado=JSON.parse(localStorage.getItem('raizes-sessao')||'null')
+let editandoId=null
 
-function init() {
-  const usuarios = JSON.parse(localStorage.getItem('raizes-usuarios') || '[]');
-  if (usuarios.filter(u => u.tipo === 'admin').length === 0) {
-    document.getElementById('form-login').style.display = 'none';
-    document.getElementById('form-cadastro-user').style.display = 'none';
-    document.getElementById('form-admin-setup').style.display = 'block';
-    document.getElementById('modal-login').classList.add('ativo');
+function init(){
+  const u=JSON.parse(localStorage.getItem('raizes-usuarios')||'[]')
+  if(u.filter(x=>x.tipo==='admin').length===0){
+    document.getElementById('form-login').style.display='none'
+    document.getElementById('form-cadastro-user').style.display='none'
+    document.getElementById('form-admin-setup').style.display='block'
+    document.getElementById('modal-login').classList.add('ativo')
   }
-  if (usuarioLogado) atualizarBarraUsuario();
+  if(usuarioLogado)atualizarBarraUsuario()
 }
 
-function atualizarBarraUsuario() {
-  const area = document.getElementById('area-usuario');
-  if (usuarioLogado) {
-    const badge = usuarioLogado.tipo === 'admin' ? '👑 Admin' : '👤 Usuário';
-    area.innerHTML = '<span>' + badge + ' — ' + usuarioLogado.nome + '</span><button onclick="fazerLogout()">🚪 Sair</button>';
-  } else {
-    area.innerHTML = '<button onclick="abrirModalLogin()">🔐 Entrar</button>';
+function atualizarBarraUsuario(){
+  const a=document.getElementById('area-usuario')
+  if(usuarioLogado){
+    const b=usuarioLogado.tipo==='admin'?'👑 Admin':'👤 Usuário'
+    a.innerHTML='<span>'+b+' — '+usuarioLogado.nome+'</span><button onclick="fazerLogout()">🚪 Sair</button>'
+  }else{
+    a.innerHTML='<button onclick="abrirModalLogin()">🔐 Entrar</button>'
   }
 }
 
-function abrirModalLogin() {
-  document.getElementById('form-login').style.display = 'block';
-  document.getElementById('form-cadastro-user').style.display = 'none';
-  document.getElementById('form-admin-setup').style.display = 'none';
-  document.getElementById('modal-login').classList.add('ativo');
+function abrirModalLogin(){
+  document.getElementById('form-login').style.display='block'
+  document.getElementById('form-cadastro-user').style.display='none'
+  document.getElementById('form-admin-setup').style.display='none'
+  document.getElementById('modal-login').classList.add('ativo')
+}
+function fecharModalLogin(){document.getElementById('modal-login').classList.remove('ativo')}
+function mostrarCadastroUser(){document.getElementById('form-login').style.display='none';document.getElementById('form-cadastro-user').style.display='block';document.getElementById('erro-cadastro').textContent=''}
+function mostrarLogin(){document.getElementById('form-login').style.display='block';document.getElementById('form-cadastro-user').style.display='none';document.getElementById('erro-login').textContent=''}
+
+function criarAdmin(){
+  const n=document.getElementById('setup-nome').value.trim()
+  const e=document.getElementById('setup-email').value.trim()
+  const s=document.getElementById('setup-senha').value
+  if(!n||!e||!s||s.length<4){document.getElementById('erro-setup').textContent='Preencha tudo. Senha mín. 4 caracteres.';return}
+  const u=JSON.parse(localStorage.getItem('raizes-usuarios')||'[]')
+  u.push({id:Date.now(),nome:n,email:e,senha:s,tipo:'admin'})
+  localStorage.setItem('raizes-usuarios',JSON.stringify(u))
+  usuarioLogado={id:Date.now(),nome:n,email:e,tipo:'admin'}
+  localStorage.setItem('raizes-sessao',JSON.stringify(usuarioLogado))
+  fecharModalLogin();atualizarBarraUsuario()
 }
 
-function fecharModalLogin() { document.getElementById('modal-login').classList.remove('ativo'); }
-
-function mostrarCadastroUser() {
-  document.getElementById('form-login').style.display = 'none';
-  document.getElementById('form-cadastro-user').style.display = 'block';
-  document.getElementById('erro-cadastro').textContent = '';
+function criarUsuario(){
+  const n=document.getElementById('cad-user-nome').value.trim()
+  const e=document.getElementById('cad-user-email').value.trim()
+  const s=document.getElementById('cad-user-senha').value
+  if(!n||!e||!s||s.length<4){document.getElementById('erro-cadastro').textContent='Preencha tudo. Senha mín. 4 caracteres.';return}
+  let u=JSON.parse(localStorage.getItem('raizes-usuarios')||'[]')
+  if(u.find(x=>x.email===e)){document.getElementById('erro-cadastro').textContent='E-mail já existe.';return}
+  u.push({id:Date.now(),nome:n,email:e,senha:s,tipo:'user'})
+  localStorage.setItem('raizes-usuarios',JSON.stringify(u))
+  usuarioLogado={id:Date.now(),nome:n,email:e,tipo:'user'}
+  localStorage.setItem('raizes-sessao',JSON.stringify(usuarioLogado))
+  fecharModalLogin();atualizarBarraUsuario();atualizarAvisoPendente()
 }
 
-function mostrarLogin() {
-  document.getElementById('form-login').style.display = 'block';
-  document.getElementById('form-cadastro-user').style.display = 'none';
-  document.getElementById('erro-login').textContent = '';
+function fazerLogin(){
+  const e=document.getElementById('login-email').value.trim()
+  const s=document.getElementById('login-senha').value
+  const u=JSON.parse(localStorage.getItem('raizes-usuarios')||'[]')
+  const user=u.find(x=>x.email===e&&x.senha===s)
+  if(!user){document.getElementById('erro-login').textContent='E-mail ou senha incorretos.';return}
+  usuarioLogado={id:user.id,nome:user.nome,email:user.email,tipo:user.tipo}
+  localStorage.setItem('raizes-sessao',JSON.stringify(usuarioLogado))
+  fecharModalLogin();atualizarBarraUsuario();atualizarAvisoPendente()
 }
 
-function criarAdmin() {
-  const nome = document.getElementById('setup-nome').value.trim();
-  const email = document.getElementById('setup-email').value.trim();
-  const senha = document.getElementById('setup-senha').value;
-  if (!nome || !email || !senha || senha.length < 4) { document.getElementById('erro-setup').textContent = 'Preencha todos os campos. Senha mín. 4 caracteres.'; return; }
-  const usuarios = JSON.parse(localStorage.getItem('raizes-usuarios') || '[]');
-  usuarios.push({ id: Date.now(), nome, email, senha, tipo: 'admin' });
-  localStorage.setItem('raizes-usuarios', JSON.stringify(usuarios));
-  usuarioLogado = { id: Date.now(), nome, email, tipo: 'admin' };
-  localStorage.setItem('raizes-sessao', JSON.stringify(usuarioLogado));
-  fecharModalLogin();
-  atualizarBarraUsuario();
+function fazerLogout(){usuarioLogado=null;localStorage.removeItem('raizes-sessao');atualizarBarraUsuario()}
+function isAdmin(){return usuarioLogado&&usuarioLogado.tipo==='admin'}
+function atualizarAvisoPendente(){document.getElementById('aviso-pendente').style.display='none'}
+
+function abrirTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('ativo'))
+  document.querySelectorAll('.formulario').forEach(x=>x.classList.remove('ativo'))
+  if(t==='escola'){document.querySelectorAll('.tab')[0].classList.add('ativo');document.getElementById('form-escola').classList.add('ativo')}
+  else if(t==='lar'){document.querySelectorAll('.tab')[1].classList.add('ativo');document.getElementById('form-lar').classList.add('ativo')}
+  else{document.querySelectorAll('.tab')[2].classList.add('ativo');document.getElementById('form-voluntario').classList.add('ativo')}
 }
 
-function criarUsuario() {
-  const nome = document.getElementById('cad-user-nome').value.trim();
-  const email = document.getElementById('cad-user-email').value.trim();
-  const senha = document.getElementById('cad-user-senha').value;
-  if (!nome || !email || !senha || senha.length < 4) { document.getElementById('erro-cadastro').textContent = 'Preencha todos os campos. Senha mín. 4 caracteres.'; return; }
-  let usuarios = JSON.parse(localStorage.getItem('raizes-usuarios') || '[]');
-  if (usuarios.find(u => u.email === email)) { document.getElementById('erro-cadastro').textContent = 'Este e-mail já existe.'; return; }
-  usuarios.push({ id: Date.now(), nome, email, senha, tipo: 'user' });
-  localStorage.setItem('raizes-usuarios', JSON.stringify(usuarios));
-  usuarioLogado = { id: Date.now(), nome, email, tipo: 'user' };
-  localStorage.setItem('raizes-sessao', JSON.stringify(usuarioLogado));
-  fecharModalLogin();
-  atualizarBarraUsuario();
-  atualizarAvisoPendente();
+function cadastrar(t){
+  let d
+  if(t==='escola'){d={tipo:'🏫 Escola',nome:document.getElementById('escola-nome').value,endereco:document.getElementById('escola-endereco').value,telefone:document.getElementById('escola-telefone').value,email:document.getElementById('escola-email').value,responsavel:document.getElementById('escola-responsavel').value,qtd_alunos:document.getElementById('escola-alunos').value,espaco_horta:document.getElementById('escola-espaco').value,observacoes:document.getElementById('escola-obs').value}}
+  else if(t==='lar'){d={tipo:'🏠 Lar de Idosos',nome:document.getElementById('lar-nome').value,endereco:document.getElementById('lar-endereco').value,telefone:document.getElementById('lar-telefone').value,email:document.getElementById('lar-email').value,responsavel:document.getElementById('lar-responsavel').value,qtd_idosos:document.getElementById('lar-idosos').value,espaco_horta:document.getElementById('lar-espaco').value,observacoes:document.getElementById('lar-obs').value}}
+  else{d={tipo:'🤝 Voluntário',nome:document.getElementById('vol-nome').value,telefone:document.getElementById('vol-telefone').value,email:document.getElementById('vol-email').value,area:document.getElementById('vol-area').value,mensagem:document.getElementById('vol-msg').value}}
+  if(!d.nome){alert('Preencha o Nome.');return}
+  let l=JSON.parse(localStorage.getItem('raizes-cadastros')||'[]')
+  d.id=Date.now();d.data=new Date().toLocaleDateString('pt-BR')
+  if(isAdmin()){d.status='aprovado';d.aprovadoPor=usuarioLogado.email}else{d.status='pendente';d.autor=usuarioLogado?usuarioLogado.email:''}
+  l.push(d);localStorage.setItem('raizes-cadastros',JSON.stringify(l))
+  if(isAdmin())alert('✅ Cadastro realizado!');else document.getElementById('aviso-pendente').style.display='block'
+  document.querySelectorAll('.formulario.ativo input,.formulario.ativo textarea').forEach(x=>x.value='')
+  document.querySelectorAll('.formulario.ativo select').forEach(x=>x.selectedIndex=0)
+  abrirLista()
 }
 
-function fazerLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const senha = document.getElementById('login-senha').value;
-  const usuarios = JSON.parse(localStorage.getItem('raizes-usuarios') || '[]');
-  const user = usuarios.find(u => u.email === email && u.senha === senha);
-  if (!user) { document.getElementById('erro-login').textContent = 'E-mail ou senha incorretos.'; return; }
-  usuarioLogado = { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo };
-  localStorage.setItem('raizes-sessao', JSON.stringify(usuarioLogado));
-  fecharModalLogin();
-  atualizarBarraUsuario();
-  atualizarAvisoPendente();
-}
-
-function fazerLogout() {
-  usuarioLogado = null;
-  localStorage.removeItem('raizes-sessao');
-  atualizarBarraUsuario();
-}
-
-function isAdmin() { return usuarioLogado && usuarioLogado.tipo === 'admin'; }
-function atualizarAvisoPendente() { document.getElementById('aviso-pendente').style.display = 'none'; }
-
-function abrirTab(tipo) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
-  document.querySelectorAll('.formulario').forEach(f => f.classList.remove('ativo'));
-  if (tipo === 'escola') { document.querySelectorAll('.tab')[0].classList.add('ativo'); document.getElementById('form-escola').classList.add('ativo'); }
-  else if (tipo === 'lar') { document.querySelectorAll('.tab')[1].classList.add('ativo'); document.getElementById('form-lar').classList.add('ativo'); }
-  else { document.querySelectorAll('.tab')[2].classList.add('ativo'); document.getElementById('form-voluntario').classList.add('ativo'); }
-}
-
-function cadastrar(tipo) {
-  let dados;
-  if (tipo === 'escola') {
-    dados = { tipo: '🏫 Escola', nome: document.getElementById('escola-nome').value, endereco: document.getElementById('escola-endereco').value, telefone: document.getElementById('escola-telefone').value, email: document.getElementById('escola-email').value, responsavel: document.getElementById('escola-responsavel').value, qtd_alunos: document.getElementById('escola-alunos').value, espaco_horta: document.getElementById('escola-espaco').value, observacoes: document.getElementById('escola-obs').value };
-  } else if (tipo === 'lar') {
-    dados = { tipo: '🏠 Lar de Idosos', nome: document.getElementById('lar-nome').value, endereco: document.getElementById('lar-endereco').value, telefone: document.getElementById('lar-telefone').value, email: document.getElementById('lar-email').value, responsavel: document.getElementById('lar-responsavel').value, qtd_idosos: document.getElementById('lar-idosos').value, espaco_horta: document.getElementById('lar-espaco').value, observacoes: document.getElementById('lar-obs').value };
-  } else {
-    dados = { tipo: '🤝 Voluntário', nome: document.getElementById('vol-nome').value, telefone: document.getElementById('vol-telefone').value, email: document.getElementById('vol-email').value, area: document.getElementById('vol-area').value, mensagem: document.getElementById('vol-msg').value };
-  }
-  if (!dados.nome) { alert('Preencha o campo Nome.'); return; }
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  dados.id = Date.now();
-  dados.data = new Date().toLocaleDateString('pt-BR');
-  if (isAdmin()) { dados.status = 'aprovado'; dados.aprovadoPor = usuarioLogado.email; }
-  else { dados.status = 'pendente'; dados.autor = usuarioLogado ? usuarioLogado.email : ''; }
-  lista.push(dados);
-  localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
-  if (isAdmin()) { alert('✅ Cadastro realizado!'); } else { document.getElementById('aviso-pendente').style.display = 'block'; }
-  document.querySelectorAll('.formulario.ativo input, .formulario.ativo textarea').forEach(el => el.value = '');
-  document.querySelectorAll('.formulario.ativo select').forEach(el => el.selectedIndex = 0);
-  abrirLista();
-}
-
-function abrirLista() {
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  if (lista.length === 0) { alert('Nenhum cadastro ainda.'); return; }
-  let listaFiltrada;
-  if (isAdmin()) { listaFiltrada = lista; }
-  else if (usuarioLogado) { listaFiltrada = lista.filter(d => d.status === 'aprovado' || d.autor === usuarioLogado.email); }
-  else { listaFiltrada = lista.filter(d => d.status === 'aprovado'); }
-  if (listaFiltrada.length === 0) { alert('Nenhum cadastro disponível.'); return; }
-  document.getElementById('lista-cadastros').style.display = 'block';
-  let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.85em;">';
-  html += '<tr style="background:#2d6a4f;color:white;"><th style="padding:6px;">Tipo</th><th style="padding:6px;">Nome</th><th style="padding:6px;">Telefone</th><th style="padding:6px;">Responsável</th><th style="padding:6px;">Status</th><th style="padding:6px;">Data</th>';
-  if (isAdmin()) html += '<th style="padding:6px;text-align:center;">Ações</th>';
-  html += '</tr>';
-  listaFiltrada.forEach(d => {
-    let s = '';
-    if (d.status === 'pendente') s = '<span class="status-pendente">⏳ Pendente</span>';
-    else if (d.status === 'aprovado') s = '<span class="status-aprovado">✅ Aprovado</span>';
-    else s = '<span class="status-rejeitado">❌ Rejeitado</span>';
-    html += '<tr style="border-bottom:1px solid #ddd;"><td style="padding:6px;">' + (d.tipo||'') + '</td><td style="padding:6px;"><strong>' + (d.nome||'') + '</strong></td><td style="padding:6px;">' + (d.telefone||'-') + '</td><td style="padding:6px;">' + (d.responsavel||'-') + '</td><td style="padding:6px;">' + s + '</td><td style="padding:6px;">' + (d.data||'') + '</td>';
-    if (isAdmin()) {
-      html += '<td style="padding:6px;text-align:center;white-space:nowrap;">' +
-        '<button class="btn-sm btn-edit" onclick="abrirEditar(' + d.id + ')" style="margin-right:3px;">✏️</button>' +
-        '<button class="btn-sm btn-danger" onclick="excluirCadastro(' + d.id + ')" style="margin-right:3px;">🗑️</button>';
-      if (d.status === 'pendente') html += '<button class="btn-sm btn-success" onclick="aprovarCadastro(' + d.id + ')" style="margin-right:3px;">✅</button><button class="btn-sm btn-warning" onclick="rejeitarCadastro(' + d.id + ')">❌</button>';
-      html += '</td>';
+function abrirLista(){
+  let l=JSON.parse(localStorage.getItem('raizes-cadastros')||'[]')
+  if(l.length===0){alert('Nenhum cadastro.');return}
+  let f
+  if(isAdmin())f=l
+  else if(usuarioLogado)f=l.filter(d=>d.status==='aprovado'||d.autor===usuarioLogado.email)
+  else f=l.filter(d=>d.status==='aprovado')
+  if(f.length===0){alert('Nenhum disponível.');return}
+  document.getElementById('lista-cadastros').style.display='block'
+  let h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.85em">'
+  h+='<tr style="background:#2d6a4f;color:white"><th style="padding:6px">Tipo</th><th style="padding:6px">Nome</th><th style="padding:6px">Telefone</th><th style="padding:6px">Responsável</th><th style="padding:6px">Status</th><th style="padding:6px">Data</th>'
+  if(isAdmin())h+='<th style="padding:6px;text-align:center">Ações</th>'
+  h+='</tr>'
+  f.forEach(d=>{
+    let s=d.status==='pendente'?'<span class="status-pendente">⏳ Pendente</span>':d.status==='aprovado'?'<span class="status-aprovado">✅ Aprovado</span>':'<span class="status-rejeitado">❌ Rejeitado</span>'
+    h+='<tr style="border-bottom:1px solid #ddd"><td style="padding:6px">'+(d.tipo||'')+'</td><td style="padding:6px"><strong>'+(d.nome||'')+'</strong></td><td style="padding:6px">'+(d.telefone||'-')+'</td><td style="padding:6px">'+(d.responsavel||'-')+'</td><td style="padding:6px">'+s+'</td><td style="padding:6px">'+(d.data||'')+'</td>'
+    if(isAdmin()){
+      h+='<td style="padding:6px;text-align:center;white-space:nowrap"><button class="btn-sm btn-edit" onclick="abrirEditar('+d.id+')" style="margin-right:3px">✏️</button><button class="btn-sm btn-danger" onclick="excluirCadastro('+d.id+')" style="margin-right:3px">🗑️</button>'
+      if(d.status==='pendente')h+='<button class="btn-sm btn-success" onclick="aprovarCadastro('+d.id+')" style="margin-right:3px">✅</button><button class="btn-sm btn-warning" onclick="rejeitarCadastro('+d.id+')">❌</button>'
+      h+='</td>'
     }
-    html += '</tr>';
-  });
-  html += '</table></div>';
-  if (isAdmin()) {
-    const p = lista.filter(d => d.status === 'pendente').length;
-    if (p > 0) html = '<div class="aviso-admin">📌 ' + p + ' cadastro(s) aguardando aprovação</div>' + html;
-  }
-  document.getElementById('tabela-cadastros').innerHTML = html;
+    h+='</tr>'
+  })
+  h+='</table></div>'
+  if(isAdmin()){let p=l.filter(d=>d.status==='pendente').length;if(p>0)h='<div class="aviso-admin">📌 '+p+' aguardando aprovação</div>'+h}
+  document.getElementById('tabela-cadastros').innerHTML=h
 }
 
-function excluirCadastro(id) {
-  if (!isAdmin()) { alert('Apenas administradores podem excluir.'); return; }
-  if (!confirm('Tem certeza?')) return;
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  lista = lista.filter(d => d.id !== id);
-  localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
-  abrirLista();
-}
-
-function aprovarCadastro(id) {
-  if (!isAdmin()) return;
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  const idx = lista.findIndex(d => d.id === id);
-  if (idx >= 0) { lista[idx].status = 'aprovado'; lista[idx].aprovadoPor = usuarioLogado.email; localStorage.setItem('raizes-cadastros', JSON.stringify(lista)); abrirLista(); }
-}
-
-function rejeitarCadastro(id) {
-  if (!isAdmin()) return;
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  const idx = lista.findIndex(d => d.id === id);
-  if (idx >= 0) { lista[idx].status = 'rejeitado'; localStorage.setItem('raizes-cadastros', JSON.stringify(lista)); abrirLista(); }
-}
-
-function abrirEditar(id) {
-  if (!isAdmin()) { alert('Apenas administradores podem editar.'); return; }
-  const lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  const dados = lista.find(d => d.id === id);
-  if (!dados) return;
-  editandoId = id;
-  let html = '<label>Tipo</label><select id="edit-tipo"><option ' + (dados.tipo.includes('Escola')?'selected':'') + '>🏫 Escola</option><option ' + (dados.tipo.includes('Lar')?'selected':'') + '>🏠 Lar de Idosos</option><option ' + (dados.tipo.includes('Voluntário')?'selected':'') + '>🤝 Voluntário</option></select>';
-  html += '<label>Nome</label><input type="text" id="edit-nome" value="' + (dados.nome||'') + '">';
-  html += '<label>Endereço</label><input type="text" id="edit-endereco" value="' + (dados.endereco||'') + '">';
-  html += '<label>Telefone</label><input type="text" id="edit-telefone" value="' + (dados.telefone||'') + '">';
-  html += '<label>E-mail</label><input type="email" id="edit-email" value="' + (dados.email||'') + '">';
-  html += '<label>Responsável</label><input type="text" id="edit-responsavel" value="' + (dados.responsavel||'') + '">';
-  if (dados.tipo.includes('Escola')) html += '<label>Qtd Alunos</label><input type="number" id="edit-qtd" value="' + (dados.qtd_alunos||'') + '">';
-  else if (dados.tipo.includes('Lar')) html += '<label>Qtd Idosos</label><input type="number" id="edit-qtd" value="' + (dados.qtd_idosos||'') + '">';
-  html += '<label>Observações</label><textarea id="edit-obs">' + (dados.observacoes||'') + '</textarea>';
-  html += '<button class="btn" onclick="salvarEdicao()">💾 Salvar</button>';
-  html += '<button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px;">Cancelar</button>';
-  document.getElementById('form-editar').innerHTML = html;
-  document.getElementById('modal-editar').classList.add('ativo');
-}
-
-function fecharModalEditar() { document.getElementById('modal-editar').classList.remove('ativo'); editandoId = null; }
-
-function salvarEdicao() {
-  if (!editandoId) return;
-  let lista = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-  const idx = lista.findIndex(d => d.id === editandoId);
-  if (idx < 0) return;
-  lista[idx].tipo = document.getElementById('edit-tipo').value;
-  lista[idx].nome = document.getElementById('edit-nome').value;
-  lista[idx].endereco = document.getElementById('edit-endereco').value;
-  lista[idx].telefone = document.getElementById('edit-telefone').value;
-  lista[idx].email = document.getElementById('edit-email').value;
-  lista[idx].responsavel = document.getElementById('edit-responsavel').value;
-  lista[idx].observacoes = document.getElementById('edit-obs').value;
-  if (lista[idx].tipo.includes('Escola')) lista[idx].qtd_alunos = document.getElementById('edit-qtd').value;
-  else if (lista[idx].tipo.includes('Lar')) lista[idx].qtd_idosos = document.getElementById('edit-qtd').value;
-  localStorage.setItem('raizes-cadastros', JSON.stringify(lista));
-  fecharModalEditar();
-  abrirLista();
-}
-
-// IMPORTAR EXCEL
-document.getElementById('importExcel').addEventListener('change', function(e) {
-  const arquivo = e.target.files[0];
-  if (!arquivo) return;
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    try {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const primeiraAba = workbook.SheetNames[0];
-      const planilha = workbook.Sheets[primeiraAba];
-      const linhas = XLSX.utils.sheet_to_json(planilha, { header: 1 });
-      const cadastros = JSON.parse(localStorage.getItem('raizes-cadastros') || '[]');
-      let importados = 0, erros = 0;
-      for (let i = 1; i < linhas.length; i++) {
-        const valores = linhas[i];
-        if (!valores || valores.length < 2 || !valores[1]) { erros++; continue; }
-        cadastros.push({ id: Date.now() + i, tipo: String(valores[0]||'Escola').trim(), nome: String(valores[1]||'').trim(), endereco: String(valores[2]||'').trim(), telefone: String(valores[3]||'').trim(), email: String(valores[4]||'').trim(), responsavel: String(valores[5]||'').trim(), qtd_alunos: String(valores[6]||'').trim(), observacoes: String(valores[7]||'').trim(), data: new Date().toLocaleDateString('pt-BR'), status: 'aprovado', aprovadoPor: 'admin' });
-        importados++;
-      }
-      localStorage.setItem('raizes-cadastros', JSON.stringify(cadastros));
-      document.getElementById('resultadoImport').innerHTML = '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600;">✅ ' + importados + ' escola(s) importada(s)' + (erros>0?'. ⚠️ '+erros+' linha(s) ignoradas':'') + '</span>';
-    } catch(err) {
-      document.getElementById('resultadoImport').innerHTML = '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600;">❌ Erro. Verifique se é .xlsx válido.</span>';
-    }
-  };
-  reader.readAsArrayBuffer(arquivo);
-});
-
-init();
-</script>
-
-</body>
-</html>
+function excluirCadastro(id){if(!isAdmin()){alert('Só admin.');return}if(!confirm('Tem certeza?'))return;let l=JSON.parse(localStorage.getItem('raizes-cadastros')||'[]');l=l.filter(d=>d.id!==id);localStorage.setItem('raizes-cadastros',JSON.stringify(l));abrirLista()}
+function aprovarCadastro(id){if(!isAdmin())return;let l=JSON.parse(localStorage.getItem('raizes-cadastros')||'[]');let i=l.findIndex(d=>d.id===id);if(i>=0){l[i].status='aprovado';l[i].aprovadoPor=usuarioLogado.email;localStorage.setItem('raizes-cadastros',JSON.stringify(l));abrirLista()}}
+function rejeitarCadastro(id){if(!isAdmin())return;let
