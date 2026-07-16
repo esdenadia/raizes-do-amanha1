@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#f0f7f4}
@@ -135,6 +136,15 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
     <div class="card"><h2>📋 Cadastros</h2><div id="tabela-cadastros"></div></div>
   </div>
 
+  <hr style="margin:30px 0;border:0;border-top:1px solid #ccc">
+
+  <div class="card" style="text-align:center">
+    <h3 style="color:#1b4332">📥 Importar escolas de arquivo Excel</h3>
+    <p style="color:#666;margin-bottom:10px">Selecione o arquivo .xlsx ou .xls com os dados das escolas.</p>
+    <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto">
+    <div id="resultadoImport" style="font-size:.9em;margin-top:8px"></div>
+  </div>
+
   <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
 </div>
 
@@ -189,7 +199,7 @@ const auth = firebase.auth();
 // ===== VARIÁVEIS GLOBAIS =====
 let usuarioLogado = null;
 let editandoId = null;
-const ADMIN_EMAIL = 'admin@raizes.com';
+const ADMIN_EMAIL = 'esdenadia@gmail.com';
 
 // ===== OBSERVAR ESTADO DO LOGIN =====
 auth.onAuthStateChanged(function(user) {
@@ -210,7 +220,7 @@ function isAdmin() {
 function atualizarBarraUsuario() {
   const area = document.getElementById('area-usuario');
   if (usuarioLogado) {
-    const badge = isAdmin() ? '👑 Admin' : '👤 ' + usuarioLogado.displayName;
+    const badge = isAdmin() ? '👑 Admin' : '👤 ' + (usuarioLogado.displayName || usuarioLogado.email);
     area.innerHTML = '<span>' + badge + ' — ' + usuarioLogado.email + '</span><button onclick="fazerLogout()">🚪 Sair</button>';
   } else {
     area.innerHTML = '<button onclick="abrirModalLogin()">🔐 Entrar</button>';
@@ -251,7 +261,6 @@ function criarUsuario() {
     })
     .then(function() {
       fecharModalLogin();
-      atualizarBarraUsuario();
     })
     .catch(function(err) {
       if (err.code === 'auth/email-already-in-use') document.getElementById('erro-cadastro').textContent = 'E-mail já cadastrado.';
@@ -277,7 +286,7 @@ function fazerLogout() {
 
 function atualizarAvisoPendente() {
   const aviso = document.getElementById('aviso-pendente');
-  aviso.style.display = 'none';
+  if (aviso) aviso.style.display = 'none';
 }
 
 // ===== ABAS =====
@@ -301,126 +310,3 @@ function cadastrar(t) {
     d = { tipo: '🤝 Voluntário', nome: document.getElementById('vol-nome').value, telefone: document.getElementById('vol-telefone').value, email: document.getElementById('vol-email').value, area: document.getElementById('vol-area').value, mensagem: document.getElementById('vol-msg').value };
   }
   if (!d.nome) { alert('Preencha o Nome.'); return; }
-  d.data = new Date().toLocaleDateString('pt-BR');
-  d.autorEmail = usuarioLogado.email;
-  d.autorNome = usuarioLogado.displayName || usuarioLogado.email;
-  if (isAdmin()) { d.status = 'aprovado'; d.aprovadoPor = usuarioLogado.email; }
-  else { d.status = 'pendente'; }
-  db.collection('cadastros').add(d)
-    .then(function() {
-      if (isAdmin()) alert('✅ Cadastro realizado!');
-      else { document.getElementById('aviso-pendente').style.display = 'block'; }
-      document.querySelectorAll('.formulario.ativo input,.formulario.ativo textarea').forEach(x => x.value = '');
-      document.querySelectorAll('.formulario.ativo select').forEach(x => x.selectedIndex = 0);
-      abrirLista();
-    })
-    .catch(function(err) { alert('Erro ao salvar: ' + err.message); });
-}
-
-// ===== LISTAR CADASTROS =====
-function abrirLista() {
-  const listaDiv = document.getElementById('lista-cadastros');
-  const tabela = document.getElementById('tabela-cadastros');
-  listaDiv.style.display = 'block';
-  tabela.innerHTML = '<p style="text-align:center;color:#888;">Carregando...</p>';
-
-  db.collection('cadastros').orderBy('data', 'desc').get()
-    .then(function(snapshot) {
-      if (snapshot.empty) { tabela.innerHTML = '<p style="text-align:center;color:#888;">Nenhum cadastro ainda.</p>'; return; }
-      let lista = [];
-      snapshot.forEach(function(doc) { let d = doc.data(); d.firebaseId = doc.id; lista.push(d); });
-      let filtrada;
-      if (isAdmin()) filtrada = lista;
-      else if (usuarioLogado) filtrada = lista.filter(d => d.status === 'aprovado' || d.autorEmail === usuarioLogado.email);
-      else filtrada = lista.filter(d => d.status === 'aprovado');
-      if (filtrada.length === 0) { tabela.innerHTML = '<p style="text-align:center;color:#888;">Nenhum cadastro disponível.</p>'; return; }
-      let h = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.85em">';
-      h += '<tr style="background:#2d6a4f;color:white"><th style="padding:6px">Tipo</th><th style="padding:6px">Nome</th><th style="padding:6px">Telefone</th><th style="padding:6px">Responsável</th><th style="padding:6px">Status</th><th style="padding:6px">Data</th>';
-      if (isAdmin()) h += '<th style="padding:6px;text-align:center">Ações</th>';
-      h += '</tr>';
-      filtrada.forEach(d => {
-        let s = d.status === 'pendente' ? '<span class="status-pendente">⏳ Pendente</span>' : d.status === 'aprovado' ? '<span class="status-aprovado">✅ Aprovado</span>' : '<span class="status-rejeitado">❌ Rejeitado</span>';
-        h += '<tr style="border-bottom:1px solid #ddd"><td style="padding:6px">' + (d.tipo || '') + '</td><td style="padding:6px"><strong>' + (d.nome || '') + '</strong></td><td style="padding:6px">' + (d.telefone || '-') + '</td><td style="padding:6px">' + (d.responsavel || '-') + '</td><td style="padding:6px">' + s + '</td><td style="padding:6px">' + (d.data || '') + '</td>';
-        if (isAdmin()) {
-          h += '<td style="padding:6px;text-align:center;white-space:nowrap"><button class="btn-sm btn-edit" onclick="abrirEditar(\'' + d.firebaseId + '\')" style="margin-right:3px">✏️</button><button class="btn-sm btn-danger" onclick="excluirCadastro(\'' + d.firebaseId + '\')" style="margin-right:3px">🗑️</button>';
-          if (d.status === 'pendente') h += '<button class="btn-sm btn-success" onclick="aprovarCadastro(\'' + d.firebaseId + '\')" style="margin-right:3px">✅</button><button class="btn-sm btn-warning" onclick="rejeitarCadastro(\'' + d.firebaseId + '\')">❌</button>';
-          h += '</td>';
-        }
-        h += '</tr>';
-      });
-      h += '</table></div>';
-      if (isAdmin()) { let p = lista.filter(d => d.status === 'pendente').length; if (p > 0) h = '<div class="aviso-admin">📌 ' + p + ' aguardando aprovação</div>' + h; }
-      tabela.innerHTML = h;
-    })
-    .catch(function(err) { tabela.innerHTML = '<p style="text-align:center;color:#c0392b;">Erro ao carregar.</p>'; });
-}
-
-// ===== EXCLUIR =====
-function excluirCadastro(id) {
-  if (!isAdmin()) { alert('Só admin.'); return; }
-  if (!confirm('Tem certeza?')) return;
-  db.collection('cadastros').doc(id).delete()
-    .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro ao excluir.'); });
-}
-
-// ===== APROVAR / REJEITAR =====
-function aprovarCadastro(id) {
-  if (!isAdmin()) return;
-  db.collection('cadastros').doc(id).update({ status: 'aprovado', aprovadoPor: usuarioLogado.email })
-    .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
-}
-
-function rejeitarCadastro(id) {
-  if (!isAdmin()) return;
-  db.collection('cadastros').doc(id).update({ status: 'rejeitado' })
-    .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
-}
-
-// ===== EDITAR =====
-function abrirEditar(id) {
-  if (!isAdmin()) { alert('Só admin.'); return; }
-  db.collection('cadastros').doc(id).get()
-    .then(function(doc) {
-      if (!doc.exists) return;
-      const d = doc.data();
-      editandoId = id;
-      document.getElementById('form-editar').innerHTML = gerarFormEditar(d);
-      document.getElementById('modal-editar').classList.add('ativo');
-    });
-}
-
-function gerarFormEditar(d) {
-  let h = '<label>Tipo</label><select id="edit-tipo"><option' + (d.tipo.includes('Escola') ? ' selected' : '') + '>🏫 Escola</option><option' + (d.tipo.includes('Lar') ? ' selected' : '') + '>🏠 Lar de Idosos</option><option' + (d.tipo.includes('Voluntário') ? ' selected' : '') + '>🤝 Voluntário</option></select>';
-  h += '<label>Nome</label><input type="text" id="edit-nome" value="' + (d.nome || '') + '">';
-  h += '<label>Endereço</label><input type="text" id="edit-endereco" value="' + (d.endereco || '') + '">';
-  h += '<label>Telefone</label><input type="text" id="edit-telefone" value="' + (d.telefone || '') + '">';
-  h += '<label>E-mail</label><input type="email" id="edit-email" value="' + (d.email || '') + '">';
-  h += '<label>Responsável</label><input type="text" id="edit-responsavel" value="' + (d.responsavel || '') + '">';
-  h += '<label>Obs</label><textarea id="edit-obs">' + (d.observacoes || '') + '</textarea>';
-  h += '<button class="btn" onclick="salvarEdicao()">💾 Salvar</button><button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px">Cancelar</button>';
-  return h;
-}
-
-function fecharModalEditar() { document.getElementById('modal-editar').classList.remove('ativo'); editandoId = null; }
-
-function salvarEdicao() {
-  if (!editandoId) return;
-  const data = {
-    tipo: document.getElementById('edit-tipo').value,
-    nome: document.getElementById('edit-nome').value,
-    endereco: document.getElementById('edit-endereco').value,
-    telefone: document.getElementById('edit-telefone').value,
-    email: document.getElementById('edit-email').value,
-    responsavel: document.getElementById('edit-responsavel').value,
-    observacoes: document.getElementById('edit-obs').value
-  };
-  db.collection('cadastros').doc(editandoId).update(data)
-    .then(function() { fecharModalEditar(); abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
-}
-</script>
-</body>
-</html>
