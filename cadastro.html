@@ -58,27 +58,22 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
 </style>
 </head>
 <body>
-
 <header>
   <h1>📋 Cadastro de Instituições</h1>
   <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
 </header>
-
 <div id="area-usuario"></div>
-
 <nav class="nav-bar">
   <a href="index.html">🏠 Início</a>
   <a href="cadastro.html" class="ativo">📝 Cadastro</a>
   <a href="feirinhas.html">🌽 Feirinhas</a>
 </nav>
-
 <div class="container">
   <div class="tabs">
     <button class="tab ativo" onclick="abrirTab('escola')">🏫 Escola</button>
     <button class="tab" onclick="abrirTab('lar')">🏠 Lar de Idosos</button>
     <button class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</button>
   </div>
-
   <div id="form-escola" class="formulario ativo"><div class="card">
     <h2>Cadastro de Escola</h2>
     <label>Nome da Escola *</label><input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
@@ -92,7 +87,6 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
     <label>Observações</label><textarea id="escola-obs"></textarea>
     <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
   </div></div>
-
   <div id="form-lar" class="formulario"><div class="card">
     <h2>Cadastro de Lar de Idosos</h2>
     <label>Nome *</label><input type="text" id="lar-nome" placeholder="Nome do lar">
@@ -106,7 +100,6 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
     <label>Observações</label><textarea id="lar-obs"></textarea>
     <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Lar</button>
   </div></div>
-
   <div id="form-voluntario" class="formulario"><div class="card">
     <h2>Cadastro de Voluntário</h2>
     <label>Nome Completo *</label><input type="text" id="vol-nome" placeholder="Seu nome">
@@ -117,14 +110,10 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
     <label>Mensagem</label><textarea id="vol-msg"></textarea>
     <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
   </div></div>
-
   <div id="aviso-pendente" class="aviso-admin" style="display:none">⏳ Cadastro enviado. Aguarda aprovação do administrador.</div>
-
   <div style="text-align:center;margin-top:30px"><button onclick="abrirLista()" class="btn">📋 Ver cadastros</button></div>
   <div id="lista-cadastros" style="display:none;margin-top:20px"><div class="card"><h2>📋 Cadastros</h2><div id="tabela-cadastros"></div></div></div>
-
   <hr style="margin:30px 0;border:0;border-top:1px solid #ccc">
-
   <div class="card" style="text-align:center">
     <h3 style="color:#1b4332">📥 Importar escolas de arquivo Excel</h3>
     <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto">
@@ -132,12 +121,10 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
   </div>
   <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
 </div>
-
 <footer>
   <p><strong>🌿 Raízes do Amanhã</strong> — Sustentabilidade e Segurança Alimentar</p>
   <p>Projeto — UNINTER | Porto Alegre/RS</p>
 </footer>
-
 <div class="modal-overlay" id="modal-login"><div class="modal">
   <h2>🔐 Entrar</h2>
   <div id="form-login">
@@ -164,12 +151,10 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
     <div id="erro-setup" class="erro"></div>
   </div>
 </div></div>
-
 <div class="modal-overlay" id="modal-editar"><div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
   <h2>✏️ Editar Cadastro</h2>
   <div id="form-editar"></div>
 </div></div>
-
 <script>
 var usuarioLogado=JSON.parse(localStorage.getItem('raizes-sessao')||'null')
 var editandoId=null
