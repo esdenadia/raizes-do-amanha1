@@ -89,7 +89,7 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
       <label>Endereço *</label><input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
       <label>Telefone *</label><input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
       <label>E-mail</label><input type="email" id="escola-email" placeholder="escola@exemplo.com">
-      <label>Responsável *</label><input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">
+      <label>Responsável *</label><input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">      
       <label>Qtd alunos</label><input type="number" id="escola-alunos" placeholder="Ex: 200">
       <label>Espaço para horta?</label>
       <select id="escola-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
@@ -368,9 +368,13 @@ function abrirLista() {
 function excluirCadastro(id) {
   if (!isAdmin()) { alert('Só admin.'); return; }
   if (!confirm('Tem certeza?')) return;
+  console.log('Excluindo ID:', id); // ← pra ver se o id vem certo
   db.collection('cadastros').doc(id).delete()
     .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro ao excluir.'); });
+    .catch(function(err) { 
+      console.error('Erro completo:', err); // ← mostra o erro real no console
+      alert('Erro ao excluir: ' + err.message); // ← mostra a mensagem real
+    });
 }
 function aprovarCadastro(id) {
   if (!isAdmin()) return;
@@ -399,6 +403,8 @@ function abrirEditar(id) {
       h += '<label>Telefone</label><input type="text" id="edit-telefone" value="' + (d.telefone || '') + '">';
       h += '<label>E-mail</label><input type="email" id="edit-email" value="' + (d.email || '') + '">';
       h += '<label>Responsável</label><input type="text" id="edit-responsavel" value="' + (d.responsavel || '') + '">';
+      h += '<label>Quantidade de Alunos (aprox.)</label><input type="number" id="edit-alunos" value="' + (d.quantidade_alunos || '') + '">';
+      h += '<label>Possui Espaço para Horta</label><select id="edit-espaco"><option value="">Selecione...</option><option value="Sim"' + (d.possui_espaco_horta === 'Sim' ? ' selected' : '') + '>Sim</option><option value="Não"' + (d.possui_espaco_horta === 'Não' ? ' selected' : '') + '>Não</option><option value="Parcial"' + (d.possui_espaco_horta === 'Parcial' ? ' selected' : '') + '>Parcial</option></select>';
       h += '<label>Obs</label><textarea id="edit-obs">' + (d.observacoes || '') + '</textarea>';
       h += '<button class="btn" onclick="salvarEdicao()">💾 Salvar</button><button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px">Cancelar</button>';
       document.getElementById('form-editar').innerHTML = h;
@@ -407,19 +413,21 @@ function abrirEditar(id) {
 }
 function fecharModalEditar() { document.getElementById('modal-editar').classList.remove('ativo'); editandoId = null; }
 function salvarEdicao() {
-  if (!editandoId) return;
-  var data = {
+  var dadosAtualizados = {
     tipo: document.getElementById('edit-tipo').value,
     nome: document.getElementById('edit-nome').value,
     endereco: document.getElementById('edit-endereco').value,
     telefone: document.getElementById('edit-telefone').value,
     email: document.getElementById('edit-email').value,
     responsavel: document.getElementById('edit-responsavel').value,
+    quantidade_alunos: document.getElementById('edit-alunos').value,
+    possui_espaco_horta: document.getElementById('edit-espaco').value,
     observacoes: document.getElementById('edit-obs').value
   };
-  db.collection('cadastros').doc(editandoId).update(data)
+
+  db.collection('cadastros').doc(editandoId).update(dadosAtualizados)
     .then(function() { fecharModalEditar(); abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
+    .catch(function(err) { alert('Erro ao salvar: ' + err.message); });
 }
 
 // ===== IMPORTAR EXCEL PARA FIRESTORE =====
