@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function souAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)).data.tipo == 'admin';
+    }
+
+    match /cadastros/{cadastroId} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if souAdmin();
+    }
+
+    match /USUARIOS/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.tipo == 'user';
+      allow update, delete: if false;
+    }
+  }
+}

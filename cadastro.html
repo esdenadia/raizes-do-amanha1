@@ -4,10 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cadastro - Raízes do Amanhã</title>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- ================= FIREBASE (Auth + Firestore) ================= -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, getDocs, doc,
+    updateDoc, deleteDoc, getDoc, setDoc
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwriaAetZrv1nhnMypnFOMOBXZyq7WCUQ",
+    authDomain: "raizes-do-amanha1.firebaseapp.com",
+    projectId: "raizes-do-amanha1",
+    storageBucket: "raizes-do-amanha1.firebasestorage.app",
+    messagingSenderId: "265030217755",
+    appId: "1:265030217755:web:0425b10da8fc4b339608be",
+    measurementId: "G-27FH5W7LQ2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  window.db=db
+  window.fsCollection=collection; window.fsAdd=addDoc; window.fsGetDocs=getDocs
+  window.fsDoc=doc; window.fsUpdate=updateDoc; window.fsDelete=deleteDoc
+  window.fsGetDoc=getDoc; window.fsSetDoc=setDoc
+
+  window.auth=auth
+  window.authSignIn=signInWithEmailAndPassword
+  window.authCreateUser=createUserWithEmailAndPassword
+  window.authSignOut=signOut
+
+  window.dispatchEvent(new Event('firebase-pronto'))
+
+  onAuthStateChanged(auth, async function(user){
+    if(user){
+      var tipo='user', categoria=null
+      try{
+        var snap = await getDoc(doc(db,'USUARIOS',user.uid))
+        if(snap.exists()){
+          if(snap.data().tipo==='admin')tipo='admin'
+          categoria=snap.data().categoria||null
+        }
+      }catch(e){console.error('Erro ao checar perfil de usuário',e)}
+      window.usuarioAtual={uid:user.uid,email:user.email,tipo:tipo,categoria:categoria}
+    }else{
+      window.usuarioAtual=null
+    }
+    if(window.atualizarBarraUsuario)window.atualizarBarraUsuario()
+    if(window.aplicarCategoriaNaAba)window.aplicarCategoriaNaAba()
+  })
+</script>
+<!-- ================================================================= -->
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#f0f7f4}
@@ -34,6 +90,7 @@ input,select,textarea{width:100%;padding:10px 12px;margin-top:5px;border:1px sol
 textarea{min-height:80px}
 .btn{display:inline-block;background:#2d6a4f;color:#fff;padding:12px 28px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:1em;margin-top:20px}
 .btn:hover{background:#1b4332}
+.btn:disabled{opacity:.6;cursor:not-allowed}
 .btn-sm{padding:4px 12px;font-size:.85em;border:none;border-radius:4px;cursor:pointer;font-weight:600}
 .btn-edit{background:#f39c12;color:#fff}
 .btn-edit:hover{background:#d68910}
@@ -49,7 +106,7 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
 .modal-overlay.ativo{display:flex}
 .modal{background:#fff;border-radius:12px;padding:30px;width:90%;max-width:420px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .modal h2{color:#1b4332;margin-bottom:20px;text-align:center}
-.modal input{margin-bottom:10px}
+.modal input,.modal select{margin-bottom:10px}
 .modal .btn{width:100%;margin-top:10px}
 .modal p{text-align:center;margin-top:15px;font-size:.9em}
 .modal p a{color:#2d6a4f;font-weight:600;cursor:pointer}
@@ -58,432 +115,541 @@ footer{background:#1b4332;color:#aaa;text-align:center;padding:30px 20px;margin-
 .status-aprovado{color:#27ae60;font-weight:600;font-size:.85em}
 .status-rejeitado{color:#c0392b;font-weight:600;font-size:.85em}
 .aviso-admin{background:#fff3cd;color:#856404;padding:12px 16px;border-radius:8px;text-align:center;font-weight:600;margin:15px 0;border:1px solid #ffc107}
+.carregando{text-align:center;color:#888;padding:20px;font-style:italic}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>📋 Cadastro de Instituições</h1>
-  <p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
+<h1>📋 Cadastro de Instituições</h1>
+<p>Raízes do Amanhã — Sustentabilidade e Segurança Alimentar</p>
 </header>
 
 <div id="area-usuario"></div>
 
 <nav class="nav-bar">
-  <a href="index.html">🏠 Início</a>
-  <a href="cadastro.html" class="ativo">📝 Cadastro</a>
-  <a href="feirinhas.html">🌽 Feirinhas</a>
+<a href="index.html">🏠 Início</a>
+<a href="cadastro.html" class="ativo">📝 Cadastro</a>
+<a href="feirinhas.html">🌽 Feirinhas</a>
 </nav>
 
 <div class="container">
-  <div class="tabs">
-    <button class="tab ativo" onclick="abrirTab('escola')">🏫 Escola</button>
-    <button class="tab" onclick="abrirTab('lar')">🏠 Lar de Idosos</button>
-    <button class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</button>
-  </div>
 
-  <div id="form-escola" class="formulario ativo">
-    <div class="card">
-      <h2>Cadastro de Escola</h2>
-      <label>Nome da Escola *</label><input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
-      <label>Endereço *</label><input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
-      <label>Telefone *</label><input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label><input type="email" id="escola-email" placeholder="escola@exemplo.com">
-      <label>Responsável *</label><input type="text" id="escola-responsavel" placeholder="Nome do diretor ou professor">      
-      <label>Qtd alunos</label><input type="number" id="escola-alunos" placeholder="Ex: 200">
-      <label>Espaço para horta?</label>
-      <select id="escola-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
-      <label>Observações</label><textarea id="escola-obs"></textarea>
-      <button class="btn" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
-    </div>
-  </div>
+<div class="tabs">
+<button class="tab ativo" onclick="abrirTab('escola')">🏫 Escola</button>
+<button class="tab" onclick="abrirTab('lar')">🏠 Lar de Idosos</button>
+<button class="tab" onclick="abrirTab('voluntario')">🤝 Voluntário</button>
+</div>
 
-  <div id="form-lar" class="formulario">
-    <div class="card">
-      <h2>Cadastro de Lar de Idosos</h2>
-      <label>Nome *</label><input type="text" id="lar-nome" placeholder="Nome do lar">
-      <label>Endereço *</label><input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
-      <label>Telefone *</label><input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label><input type="email" id="lar-email" placeholder="contato@exemplo.com">
-      <label>Responsável *</label><input type="text" id="lar-responsavel" placeholder="Nome do responsável">
-      <label>Qtd idosos</label><input type="number" id="lar-idosos" placeholder="Ex: 40">      
-      <label>Observações</label><textarea id="lar-obs"></textarea>
-      <button class="btn" onclick="cadastrar('lar')">✅ Cadastrar Lar</button>
-    </div>
-  </div>
+<div id="form-escola" class="formulario ativo"><div class="card">
+<h2>Cadastro de Escola</h2>
+<label>Nome da Escola *</label><input type="text" id="escola-nome" placeholder="Ex: EMEF Passo D'Areia">
+<label>Endereço *</label><input type="text" id="escola-endereco" placeholder="Rua, número, bairro">
+<label>Telefone *</label><input type="text" id="escola-telefone" placeholder="(51) 99999-9999">
+<label>E-mail</label><input type="email" id="escola-email" placeholder="escola@exemplo.com">
+<label>Responsável *</label><input type="text" id="escola-responsavel" placeholder="Nome do professor">
+<label>Qtd alunos</label><input type="number" id="escola-alunos" placeholder="Ex: 200">
+<label>Espaço para horta?</label>
+<select id="escola-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
+<label>Observações</label><textarea id="escola-obs"></textarea>
+<button class="btn" id="btn-escola" onclick="cadastrar('escola')">✅ Cadastrar Escola</button>
+</div></div>
 
-  <div id="form-voluntario" class="formulario">
-    <div class="card">
-      <h2>Cadastro de Voluntário</h2>
-      <label>Nome Completo *</label><input type="text" id="vol-nome" placeholder="Seu nome">
-      <label>Telefone *</label><input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
-      <label>E-mail</label><input type="email" id="vol-email" placeholder="seu@email.com">
-      <label>Área</label>
-      <select id="vol-area"><option>Agricultura/Horta</option><option>Administrativo</option><option>Divulgação</option><option>Transporte</option><option>Flexível</option></select>
-      <label>Mensagem</label><textarea id="vol-msg"></textarea>
-      <button class="btn" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
-    </div>
-  </div>
+<div id="form-lar" class="formulario"><div class="card">
+<h2>Cadastro de Lar de Idosos</h2>
+<label>Nome *</label><input type="text" id="lar-nome" placeholder="Nome do lar">
+<label>Endereço *</label><input type="text" id="lar-endereco" placeholder="Rua, número, bairro">
+<label>Telefone *</label><input type="text" id="lar-telefone" placeholder="(51) 99999-9999">
+<label>E-mail</label><input type="email" id="lar-email" placeholder="contato@exemplo.com">
+<label>Responsável *</label><input type="text" id="lar-responsavel" placeholder="Nome">
+<label>Qtd idosos</label><input type="number" id="lar-idosos" placeholder="Ex: 40">
+<label>Espaço para horta?</label>
+<select id="lar-espaco"><option>Selecione...</option><option>Sim</option><option>Não, mas interesse</option><option>Precisamos avaliar</option></select>
+<label>Observações</label><textarea id="lar-obs"></textarea>
+<button class="btn" id="btn-lar" onclick="cadastrar('lar')">✅ Cadastrar Lar</button>
+</div></div>
 
-  <div id="aviso-pendente" class="aviso-admin" style="display:none">⏳ Cadastro enviado e aguarda aprovação do administrador.</div>
+<div id="form-voluntario" class="formulario"><div class="card">
+<h2>Cadastro de Voluntário</h2>
+<label>Nome Completo *</label><input type="text" id="vol-nome" placeholder="Seu nome">
+<label>Telefone *</label><input type="text" id="vol-telefone" placeholder="(51) 99999-9999">
+<label>E-mail</label><input type="email" id="vol-email" placeholder="seu@email.com">
+<label>Área</label>
+<select id="vol-area"><option>Agricultura/Horta</option><option>Administrativo</option><option>Divulgação</option><option>Transporte</option><option>Flexível</option></select>
+<label>Mensagem</label><textarea id="vol-msg"></textarea>
+<button class="btn" id="btn-voluntario" onclick="cadastrar('voluntario')">✅ Quero ser Voluntário</button>
+</div></div>
 
-  <div style="text-align:center;margin-top:30px">
-    <button onclick="abrirLista()" class="btn">📋 Ver cadastros</button>
-  </div>
-  <div id="lista-cadastros" style="display:none;margin-top:20px">
-    <div class="card"><h2>📋 Cadastros</h2><div id="tabela-cadastros"></div></div>
-  </div>
+<div id="aviso-pendente" class="aviso-admin" style="display:none">⏳ Cadastro enviado. Aguarda aprovação do administrador.</div>
 
-  <hr style="margin:30px 0;border:0;border-top:1px solid #ccc">
+<div style="text-align:center;margin-top:30px"><button onclick="abrirLista()" class="btn">📋 Ver cadastros</button></div>
 
-  <div class="card" style="text-align:center">
-    <h3 style="color:#1b4332">📥 Importar escolas de arquivo Excel</h3>
-    <p style="color:#666;margin-bottom:10px">Selecione o arquivo .xlsx ou .xls com os dados das escolas.</p>
-    <input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto">
-    <div id="resultadoImport" style="font-size:.9em;margin-top:8px"></div>
-  </div>
+<div id="lista-cadastros" style="display:none;margin-top:20px"><div class="card"><h2>📋 Cadastros</h2><div id="tabela-cadastros"></div></div></div>
 
-  <a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
+<hr style="margin:30px 0;border:0;border-top:1px solid #ccc">
+
+<div class="card" style="text-align:center">
+<h3 style="color:#1b4332">📥 Importar escolas de arquivo Excel</h3>
+<input type="file" id="importExcel" accept=".xlsx,.xls" style="display:inline-block;width:auto">
+<div id="resultadoImport" style="font-size:.9em;margin-top:8px"></div>
+</div>
+
+<a href="https://esdenadia.github.io/raizes-do-amanha1" class="voltar">← Voltar</a>
+
 </div>
 
 <footer>
-  <p><strong>🌿 Raízes do Amanhã</strong> — Sustentabilidade e Segurança Alimentar</p>
-  <p>Projeto de Extensão — UNINTER | Porto Alegre/RS</p>
+<p><strong>🌿 Raízes do Amanhã</strong> — Sustentabilidade e Segurança Alimentar</p>
+<p>Projeto — UNINTER | Porto Alegre/RS</p>
 </footer>
 
-<div class="modal-overlay" id="modal-login">
-  <div class="modal">
-    <h2>🔐 Entrar</h2>
-    <div id="form-login">
-      <label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com">
-      <label>Senha</label><input type="password" id="login-senha" placeholder="Sua senha">
-      <button class="btn" onclick="fazerLogin()">Entrar</button>
-      <p>Não tem conta? <a onclick="mostrarCadastroUser()">Criar conta</a></p>
-      <div id="erro-login" class="erro"></div>
-    </div>
-    <div id="form-cadastro-user" style="display:none">
-      <label>Nome</label><input type="text" id="cad-user-nome" placeholder="Seu nome">
-      <label>E-mail</label><input type="email" id="cad-user-email" placeholder="seu@email.com">
-      <label>Senha</label><input type="password" id="cad-user-senha" placeholder="Mínimo 6 caracteres">
-      <button class="btn" onclick="criarUsuario()">Criar conta</button>
-      <p>Já tem conta? <a onclick="mostrarLogin()">Fazer login</a></p>
-      <div id="erro-cadastro" class="erro"></div>
-    </div>
-  </div>
+<div class="modal-overlay" id="modal-login"><div class="modal">
+<h2>🔐 Entrar</h2>
+<div id="form-login">
+<label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com">
+<label>Senha</label><input type="password" id="login-senha" placeholder="Sua senha">
+<button class="btn" id="btn-login" onclick="fazerLogin()">Entrar</button>
+<p>Não tem conta? <a onclick="mostrarCadastroUser()">Criar conta</a></p>
+<div id="erro-login" class="erro"></div>
 </div>
+<div id="form-cadastro-user" style="display:none">
+<label>Nome</label><input type="text" id="cad-user-nome" placeholder="Seu nome">
+<label>Você representa:</label>
+<select id="cad-user-categoria">
+  <option value="escola">🏫 Escola</option>
+  <option value="lar">🏠 Lar de Idosos</option>
+  <option value="voluntario">🤝 Voluntário</option>
+</select>
+<label>E-mail</label><input type="email" id="cad-user-email" placeholder="seu@email.com">
+<label>Senha</label><input type="password" id="cad-user-senha" placeholder="Mínimo 6 caracteres">
+<button class="btn" id="btn-criar-conta" onclick="criarUsuario()">Criar conta</button>
+<p>Já tem conta? <a onclick="mostrarLogin()">Fazer login</a></p>
+<div id="erro-cadastro" class="erro"></div>
+</div>
+</div></div>
 
-<div class="modal-overlay" id="modal-editar">
-  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
-    <h2>✏️ Editar Cadastro</h2>
-    <div id="form-editar"></div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-editar"><div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
+<h2>✏️ Editar Cadastro</h2>
+<div id="form-editar"></div>
+</div></div>
 
 <script>
-// ===== CONFIGURAÇÃO DO FIREBASE =====
-const firebaseConfig = {
-  apiKey: "AIzaSyAwriaAetZrv1nhnMypnFOMOBXZyq7WCUQ",
-  authDomain: "raizes-do-amanha1.firebaseapp.com",
-  projectId: "raizes-do-amanha1",
-  storageBucket: "raizes-do-amanha1.firebasestorage.app",
-  messagingSenderId: "265030217755",
-  appId: "1:265030217755:web:0425b10da8fc4b339608be",
-  measurementId: "G-27FH5W7LQ2"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+var editandoId=null
+var firebasePronto=false
+var CADASTROS_COL='cadastros'
 
-// ===== VARIÁVEIS GLOBAIS =====
-let usuarioLogado = null;
-let editandoId = null;
-const ADMIN_EMAIL = 'esdenadia@gmail.com';
+function usuarioLogado(){return window.usuarioAtual||null}
+function isAdmin(){var u=usuarioLogado();return u&&u.tipo==='admin'}
 
-// ===== OBSERVAR ESTADO DO LOGIN =====
-auth.onAuthStateChanged(function(user) {
-  if (user) {
-    usuarioLogado = user;
-    atualizarBarraUsuario();
-  } else {
-    usuarioLogado = null;
-    atualizarBarraUsuario();
-  }
-  atualizarAvisoPendente();
-});
-
-function isAdmin() {
-  return usuarioLogado && usuarioLogado.email === ADMIN_EMAIL;
+function init(){
+  atualizarBarraUsuario()
 }
 
-function atualizarBarraUsuario() {
-  const area = document.getElementById('area-usuario');
-  if (usuarioLogado) {
-    const badge = isAdmin() ? '👑 Admin' : '👤 ' + (usuarioLogado.displayName || usuarioLogado.email);
-    area.innerHTML = '<span>' + badge + ' — ' + usuarioLogado.email + '</span><button onclick="fazerLogout()">🚪 Sair</button>';
-  } else {
-    area.innerHTML = '<button onclick="abrirModalLogin()">🔐 Entrar</button>';
+window.atualizarBarraUsuario=function(){
+  var a=document.getElementById('area-usuario')
+  var u=usuarioLogado()
+  if(u){
+    var b=u.tipo==='admin'?'👑 Admin':'👤 Usuário'
+    var cat=u.categoria?' ('+rotuloCategoria(u.categoria)+')':''
+    a.innerHTML='<span>'+b+cat+' — '+u.email+'</span><button onclick="fazerLogout()">🚪 Sair</button>'
+  }else{
+    a.innerHTML='<button onclick="abrirModalLogin()">🔐 Entrar</button>'
   }
 }
 
-function abrirModalLogin() {
-  document.getElementById('form-login').style.display = 'block';
-  document.getElementById('form-cadastro-user').style.display = 'none';
-  document.getElementById('modal-login').classList.add('ativo');
+function rotuloCategoria(c){
+  if(c==='escola')return '🏫 Escola'
+  if(c==='lar')return '🏠 Lar de Idosos'
+  if(c==='voluntario')return '🤝 Voluntário'
+  return ''
 }
 
-function fecharModalLogin() { document.getElementById('modal-login').classList.remove('ativo'); }
-
-function mostrarCadastroUser() {
-  document.getElementById('form-login').style.display = 'none';
-  document.getElementById('form-cadastro-user').style.display = 'block';
-  document.getElementById('erro-cadastro').textContent = '';
+// Depois do login, abre automaticamente a aba correspondente ao perfil da pessoa
+window.aplicarCategoriaNaAba=function(){
+  var u=usuarioLogado()
+  if(u && u.categoria) abrirTab(u.categoria)
 }
 
-function mostrarLogin() {
-  document.getElementById('form-login').style.display = 'block';
-  document.getElementById('form-cadastro-user').style.display = 'none';
-  document.getElementById('erro-login').textContent = '';
+function abrirModalLogin(){
+  document.getElementById('form-login').style.display='block'
+  document.getElementById('form-cadastro-user').style.display='none'
+  document.getElementById('modal-login').classList.add('ativo')
 }
+function fecharModalLogin(){document.getElementById('modal-login').classList.remove('ativo')}
+function mostrarCadastroUser(){document.getElementById('form-login').style.display='none';document.getElementById('form-cadastro-user').style.display='block';document.getElementById('erro-cadastro').textContent=''}
+function mostrarLogin(){document.getElementById('form-login').style.display='block';document.getElementById('form-cadastro-user').style.display='none';document.getElementById('erro-login').textContent=''}
 
-function criarUsuario() {
-  const nome = document.getElementById('cad-user-nome').value.trim();
-  const email = document.getElementById('cad-user-email').value.trim();
-  const senha = document.getElementById('cad-user-senha').value;
-  if (!nome || !email || !senha || senha.length < 6) {
-    document.getElementById('erro-cadastro').textContent = 'Preencha tudo. Senha mín. 6 caracteres.';
-    return;
-  }
-  auth.createUserWithEmailAndPassword(email, senha)
-    .then(function(result) {
-      return result.user.updateProfile({ displayName: nome });
+async function criarUsuario(){
+  var n=document.getElementById('cad-user-nome').value.trim()
+  var categoria=document.getElementById('cad-user-categoria').value
+  var e=document.getElementById('cad-user-email').value.trim()
+  var s=document.getElementById('cad-user-senha').value
+  if(!n||!e||!s||s.length<6){document.getElementById('erro-cadastro').textContent='Preencha tudo. Senha mín. 6 caracteres.';return}
+
+  var btn=document.getElementById('btn-criar-conta')
+  btn.disabled=true;btn.textContent='Criando...'
+  try{
+    var cred=await window.authCreateUser(window.auth,e,s)
+    // Salva o perfil vinculado à conta: tipo (sempre 'user' na criação) + categoria escolhida
+    await window.fsSetDoc(window.fsDoc(window.db,'USUARIOS',cred.user.uid),{
+      tipo:'user',
+      categoria:categoria,
+      nome:n,
+      email:e
     })
-    .then(function() {
-      fecharModalLogin();
-    })
-    .catch(function(err) {
-      if (err.code === 'auth/email-already-in-use') document.getElementById('erro-cadastro').textContent = 'E-mail já cadastrado.';
-      else document.getElementById('erro-cadastro').textContent = 'Erro: ' + err.message;
-    });
-}
-
-function fazerLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const senha = document.getElementById('login-senha').value;
-  auth.signInWithEmailAndPassword(email, senha)
-    .then(function() { fecharModalLogin(); })
-    .catch(function(err) {
-      document.getElementById('erro-login').textContent = 'E-mail ou senha incorretos.';
-    });
-}
-
-function fazerLogout() {
-  auth.signOut();
-  usuarioLogado = null;
-  atualizarBarraUsuario();
-}
-
-function atualizarAvisoPendente() {
-  const aviso = document.getElementById('aviso-pendente');
-  if (aviso) aviso.style.display = 'none';
-}
-
-// ===== ABAS =====
-function abrirTab(t) {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('ativo'));
-  document.querySelectorAll('.formulario').forEach(x => x.classList.remove('ativo'));
-  if (t === 'escola') { document.querySelectorAll('.tab')[0].classList.add('ativo'); document.getElementById('form-escola').classList.add('ativo'); }
-  else if (t === 'lar') { document.querySelectorAll('.tab')[1].classList.add('ativo'); document.getElementById('form-lar').classList.add('ativo'); }
-  else { document.querySelectorAll('.tab')[2].classList.add('ativo'); document.getElementById('form-voluntario').classList.add('ativo'); }
-}
-
-// ===== CADASTRAR =====
-function cadastrar(t) {
-  if (!usuarioLogado) { alert('Faça login primeiro.'); abrirModalLogin(); return; }
-  let d;
-  if (t === 'escola') {
-    d = { tipo: '🏫 Escola', nome: document.getElementById('escola-nome').value, endereco: document.getElementById('escola-endereco').value, telefone: document.getElementById('escola-telefone').value, email: document.getElementById('escola-email').value, responsavel: document.getElementById('escola-responsavel').value, qtd_alunos: document.getElementById('escola-alunos').value, espaco_horta: document.getElementById('escola-espaco').value, observacoes: document.getElementById('escola-obs').value };
-  } else if (t === 'lar') {
-    d = { tipo: '🏠 Lar de Idosos', nome: document.getElementById('lar-nome').value, endereco: document.getElementById('lar-endereco').value, telefone: document.getElementById('lar-telefone').value, email: document.getElementById('lar-email').value, responsavel: document.getElementById('lar-responsavel').value, qtd_idosos: document.getElementById('lar-idosos').value, espaco_horta: document.getElementById('lar-espaco').value, observacoes: document.getElementById('lar-obs').value };
-  } else {
-    d = { tipo: '🤝 Voluntário', nome: document.getElementById('vol-nome').value, telefone: document.getElementById('vol-telefone').value, email: document.getElementById('vol-email').value, area: document.getElementById('vol-area').value, mensagem: document.getElementById('vol-msg').value };
+    fecharModalLogin()
+  }catch(err){
+    console.error(err)
+    document.getElementById('erro-cadastro').textContent=traduzErroFirebase(err)
+  }finally{
+    btn.disabled=false;btn.textContent='Criar conta'
   }
-  if (!d.nome) { alert('Preencha o Nome.'); return; }
-  d.data = new Date().toLocaleDateString('pt-BR');
-  d.autorEmail = usuarioLogado.email;
-  d.autorNome = usuarioLogado.displayName || usuarioLogado.email;
-  if (isAdmin()) { d.status = 'aprovado'; d.aprovadoPor = usuarioLogado.email; }
-  else { d.status = 'pendente'; }
-  db.collection('cadastros').add(d)
-    .then(function() {
-      if (isAdmin()) alert('✅ Cadastro realizado!');
-      else { var aviso = document.getElementById('aviso-pendente'); if (aviso) aviso.style.display = 'block'; }
-      document.querySelectorAll('.formulario.ativo input,.formulario.ativo textarea').forEach(function(x) { x.value = ''; });
-      document.querySelectorAll('.formulario.ativo select').forEach(function(x) { x.selectedIndex = 0; });
-      abrirLista();
-    })
-    .catch(function(err) { alert('Erro ao salvar: ' + err.message); });
 }
 
-// ===== LISTAR CADASTROS =====
-function abrirLista() {
-  var listaDiv = document.getElementById('lista-cadastros');
-  var tabela = document.getElementById('tabela-cadastros');
-  listaDiv.style.display = 'block';
-  tabela.innerHTML = '<p style="text-align:center;color:#888;">Carregando...</p>';
+async function fazerLogin(){
+  var e=document.getElementById('login-email').value.trim()
+  var s=document.getElementById('login-senha').value
+  if(!e||!s){document.getElementById('erro-login').textContent='Preencha e-mail e senha.';return}
 
-  db.collection('cadastros').orderBy('data', 'desc').get()
-    .then(function(snapshot) {
-      if (snapshot.empty) { tabela.innerHTML = '<p style="text-align:center;color:#888;">Nenhum cadastro ainda.</p>'; return; }
-      var lista = [];
-      snapshot.forEach(function(doc) { var d = doc.data(); d.firebaseId = doc.id; lista.push(d); });
-      var filtrada;
-      if (isAdmin()) filtrada = lista;
-      else if (usuarioLogado) filtrada = lista.filter(function(d) { return d.status === 'aprovado' || d.autorEmail === usuarioLogado.email; });
-      else filtrada = lista.filter(function(d) { return d.status === 'aprovado'; });
-      if (filtrada.length === 0) { tabela.innerHTML = '<p style="text-align:center;color:#888;">Nenhum cadastro disponível.</p>'; return; }
-      var h = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.85em">';
-      h += '<tr style="background:#2d6a4f;color:white"><th style="padding:6px">Tipo</th><th style="padding:6px">Nome</th><th style="padding:6px">Telefone</th><th style="padding:6px">Responsável</th><th style="padding:6px">Status</th><th style="padding:6px">Data</th>';
-      if (isAdmin()) h += '<th style="padding:6px;text-align:center">Ações</th>';
-      h += '</tr>';
-      filtrada.forEach(function(d) {
-        var s = d.status === 'pendente' ? '<span class="status-pendente">⏳ Pendente</span>' : d.status === 'aprovado' ? '<span class="status-aprovado">✅ Aprovado</span>' : '<span class="status-rejeitado">❌ Rejeitado</span>';
-        h += '<tr style="border-bottom:1px solid #ddd"><td style="padding:6px">' + (d.tipo || '') + '</td><td style="padding:6px"><strong>' + (d.nome || '') + '</strong></td><td style="padding:6px">' + (d.telefone || '-') + '</td><td style="padding:6px">' + (d.responsavel || '-') + '</td><td style="padding:6px">' + s + '</td><td style="padding:6px">' + (d.data || '') + '</td>';
-        if (isAdmin()) {
-          h += '<td style="padding:6px;text-align:center;white-space:nowrap"><button class="btn-sm btn-edit" onclick="abrirEditar(\'' + d.firebaseId + '\')" style="margin-right:3px">✏️</button><button class="btn-sm btn-danger" onclick="excluirCadastro(\'' + d.firebaseId + '\')" style="margin-right:3px">🗑️</button>';
-          if (d.status === 'pendente') h += '<button class="btn-sm btn-success" onclick="aprovarCadastro(\'' + d.firebaseId + '\')" style="margin-right:3px">✅</button><button class="btn-sm btn-warning" onclick="rejeitarCadastro(\'' + d.firebaseId + '\')">❌</button>';
-          h += '</td>';
+  var btn=document.getElementById('btn-login')
+  btn.disabled=true;btn.textContent='Entrando...'
+  try{
+    await window.authSignIn(window.auth,e,s)
+    fecharModalLogin()
+  }catch(err){
+    console.error(err)
+    document.getElementById('erro-login').textContent=traduzErroFirebase(err)
+  }finally{
+    btn.disabled=false;btn.textContent='Entrar'
+  }
+}
+
+async function fazerLogout(){
+  await window.authSignOut(window.auth)
+}
+
+function traduzErroFirebase(err){
+  var c=err.code||''
+  if(c.includes('email-already-in-use'))return 'Esse e-mail já está cadastrado.'
+  if(c.includes('invalid-email'))return 'E-mail inválido.'
+  if(c.includes('weak-password'))return 'Senha muito fraca (mín. 6 caracteres).'
+  if(c.includes('user-not-found')||c.includes('wrong-password')||c.includes('invalid-credential'))return 'E-mail ou senha incorretos.'
+  return 'Erro: '+(err.message||'tente novamente.')
+}
+
+function abrirTab(t){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('ativo')})
+  document.querySelectorAll('.formulario').forEach(function(x){x.classList.remove('ativo')})
+  if(t==='escola'){document.querySelectorAll('.tab')[0].classList.add('ativo');document.getElementById('form-escola').classList.add('ativo')}
+  else if(t==='lar'){document.querySelectorAll('.tab')[1].classList.add('ativo');document.getElementById('form-lar').classList.add('ativo')}
+  else{document.querySelectorAll('.tab')[2].classList.add('ativo');document.getElementById('form-voluntario').classList.add('ativo')}
+}
+
+function botaoDoTipo(t){
+  return document.getElementById(t==='escola'?'btn-escola':t==='lar'?'btn-lar':'btn-voluntario')
+}
+
+async function cadastrar(t){
+  if(!firebasePronto){alert('Conectando ao banco de dados, tente novamente em instantes.');return}
+
+  var d
+  if(t==='escola'){
+    d={tipo:'🏫 Escola',
+       nome:document.getElementById('escola-nome').value,
+       endereco:document.getElementById('escola-endereco').value,
+       telefone:document.getElementById('escola-telefone').value,
+       email:document.getElementById('escola-email').value,
+       responsavel:document.getElementById('escola-responsavel').value,
+       qtd_alunos:document.getElementById('escola-alunos').value,
+       espaco_horta:document.getElementById('escola-espaco').value,
+       observacoes:document.getElementById('escola-obs').value}
+  }else if(t==='lar'){
+    d={tipo:'🏠 Lar de Idosos',
+       nome:document.getElementById('lar-nome').value,
+       endereco:document.getElementById('lar-endereco').value,
+       telefone:document.getElementById('lar-telefone').value,
+       email:document.getElementById('lar-email').value,
+       responsavel:document.getElementById('lar-responsavel').value,
+       qtd_idosos:document.getElementById('lar-idosos').value,
+       espaco_horta:document.getElementById('lar-espaco').value,
+       observacoes:document.getElementById('lar-obs').value}
+  }else{
+    d={tipo:'🤝 Voluntário',
+       nome:document.getElementById('vol-nome').value,
+       telefone:document.getElementById('vol-telefone').value,
+       email:document.getElementById('vol-email').value,
+       area:document.getElementById('vol-area').value,
+       mensagem:document.getElementById('vol-msg').value}
+  }
+
+  if(!d.nome){alert('Preencha o Nome.');return}
+
+  d.data=new Date().toLocaleDateString('pt-BR')
+  d.criadoEm=Date.now()
+  var u=usuarioLogado()
+  if(isAdmin()){d.status='aprovado';d.aprovadoPor=u.email}
+  else{d.status='pendente';d.autor=u?u.email:''}
+
+  var btn=botaoDoTipo(t)
+  var textoOriginal=btn.textContent
+  btn.disabled=true;btn.textContent='Salvando...'
+
+  try{
+    await window.fsAdd(window.fsCollection(window.db,CADASTROS_COL), d)
+    if(isAdmin())alert('✅ Cadastro realizado!')
+    else document.getElementById('aviso-pendente').style.display='block'
+
+    document.querySelectorAll('.formulario.ativo input,.formulario.ativo textarea').forEach(function(x){x.value=''})
+    document.querySelectorAll('.formulario.ativo select').forEach(function(x){x.selectedIndex=0})
+
+    abrirLista()
+  }catch(err){
+    console.error(err)
+    alert('❌ Erro ao salvar no banco de dados: '+err.message)
+  }finally{
+    btn.disabled=false;btn.textContent=textoOriginal
+  }
+}
+
+async function carregarCadastros(){
+  var snap=await window.fsGetDocs(window.fsCollection(window.db,CADASTROS_COL))
+  var l=[]
+  snap.forEach(function(docSnap){
+    var dados=docSnap.data()
+    dados._id=docSnap.id
+    l.push(dados)
+  })
+  return l
+}
+
+async function abrirLista(){
+  if(!firebasePronto){alert('Conectando ao banco de dados, tente novamente em instantes.');return}
+
+  document.getElementById('lista-cadastros').style.display='block'
+  document.getElementById('tabela-cadastros').innerHTML='<div class="carregando">Carregando cadastros...</div>'
+
+  var l
+  try{
+    l=await carregarCadastros()
+  }catch(err){
+    console.error(err)
+    document.getElementById('tabela-cadastros').innerHTML='<div class="carregando">❌ Erro ao carregar cadastros.</div>'
+    return
+  }
+
+  if(l.length===0){document.getElementById('tabela-cadastros').innerHTML='<div class="carregando">Nenhum cadastro.</div>';return}
+
+  var u=usuarioLogado()
+  var f
+  if(isAdmin())f=l
+  else if(u)f=l.filter(function(d){return d.status==='aprovado'||d.autor===u.email})
+  else f=l.filter(function(d){return d.status==='aprovado'})
+
+  if(f.length===0){document.getElementById('tabela-cadastros').innerHTML='<div class="carregando">Nenhum disponível.</div>';return}
+
+  f.sort(function(a,b){return (b.criadoEm||0)-(a.criadoEm||0)})
+
+  var h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.85em">'
+  h+='<tr style="background:#2d6a4f;color:white">'
+    +'<th style="padding:6px">Tipo</th>'
+    +'<th style="padding:6px">Nome</th>'
+    +'<th style="padding:6px">Telefone</th>'
+    +'<th style="padding:6px">Responsável</th>'
+    +'<th style="padding:6px">Qtd</th>'
+    +'<th style="padding:6px">Horta</th>'
+    +'<th style="padding:6px">Status</th>'
+    +'<th style="padding:6px">Data</th>'
+  if(isAdmin())h+='<th style="padding:6px;text-align:center">Ações</th>'
+  h+='</tr>'
+
+  f.forEach(function(d){
+    var s=d.status==='pendente'?'<span class="status-pendente">⏳ Pendente</span>':d.status==='aprovado'?'<span class="status-aprovado">✅ Aprovado</span>':'<span class="status-rejeitado">❌ Rejeitado</span>'
+    var qtd=d.qtd_alunos||d.qtd_idosos||'-'
+    var horta=d.espaco_horta||'-'
+    h+='<tr style="border-bottom:1px solid #ddd">'
+      +'<td style="padding:6px">'+(d.tipo||'')+'</td>'
+      +'<td style="padding:6px"><strong>'+(d.nome||'')+'</strong></td>'
+      +'<td style="padding:6px">'+(d.telefone||'-')+'</td>'
+      +'<td style="padding:6px">'+(d.responsavel||'-')+'</td>'
+      +'<td style="padding:6px">'+qtd+'</td>'
+      +'<td style="padding:6px">'+horta+'</td>'
+      +'<td style="padding:6px">'+s+'</td>'
+      +'<td style="padding:6px">'+(d.data||'')+'</td>'
+    if(isAdmin()){
+      h+='<td style="padding:6px;text-align:center;white-space:nowrap">'
+        +'<button class="btn-sm btn-edit" onclick="abrirEditar(\''+d._id+'\')" style="margin-right:3px">✏️</button>'
+        +'<button class="btn-sm btn-danger" onclick="excluirCadastro(\''+d._id+'\')" style="margin-right:3px">🗑️</button>'
+      if(d.status==='pendente')h+='<button class="btn-sm btn-success" onclick="aprovarCadastro(\''+d._id+'\')" style="margin-right:3px">✅</button><button class="btn-sm btn-warning" onclick="rejeitarCadastro(\''+d._id+'\')">❌</button>'
+      h+='</td>'
+    }
+    h+='</tr>'
+  })
+  h+='</table></div>'
+
+  if(isAdmin()){
+    var p=l.filter(function(d){return d.status==='pendente'}).length
+    if(p>0)h='<div class="aviso-admin">📌 '+p+' aguardando aprovação</div>'+h
+  }
+
+  document.getElementById('tabela-cadastros').innerHTML=h
+}
+
+async function excluirCadastro(id){
+  if(!isAdmin()){alert('Só admin.');return}
+  if(!confirm('Tem certeza?'))return
+  try{
+    await window.fsDelete(window.fsDoc(window.db,CADASTROS_COL,id))
+    abrirLista()
+  }catch(err){console.error(err);alert('❌ Erro ao excluir: '+err.message)}
+}
+
+async function aprovarCadastro(id){
+  if(!isAdmin())return
+  try{
+    await window.fsUpdate(window.fsDoc(window.db,CADASTROS_COL,id),{status:'aprovado',aprovadoPor:usuarioLogado().email})
+    abrirLista()
+  }catch(err){console.error(err);alert('❌ Erro ao aprovar: '+err.message)}
+}
+
+async function rejeitarCadastro(id){
+  if(!isAdmin())return
+  try{
+    await window.fsUpdate(window.fsDoc(window.db,CADASTROS_COL,id),{status:'rejeitado'})
+    abrirLista()
+  }catch(err){console.error(err);alert('❌ Erro ao rejeitar: '+err.message)}
+}
+
+async function abrirEditar(id){
+  if(!isAdmin()){alert('Só admin.');return}
+
+  var l=await carregarCadastros()
+  var d=l.find(function(x){return x._id===id});if(!d)return
+  editandoId=id
+
+  var h='<label>Tipo</label><select id="edit-tipo">'
+    +'<option'+(d.tipo.includes('Escola')?' selected':'')+'>🏫 Escola</option>'
+    +'<option'+(d.tipo.includes('Lar')?' selected':'')+'>🏠 Lar de Idosos</option>'
+    +'<option'+(d.tipo.includes('Voluntário')?' selected':'')+'>🤝 Voluntário</option></select>'
+  h+='<label>Nome</label><input type="text" id="edit-nome" value="'+(d.nome||'')+'">'
+  h+='<label>Endereço</label><input type="text" id="edit-endereco" value="'+(d.endereco||'')+'">'
+  h+='<label>Telefone</label><input type="text" id="edit-telefone" value="'+(d.telefone||'')+'">'
+  h+='<label>E-mail</label><input type="email" id="edit-email" value="'+(d.email||'')+'">'
+  h+='<label>Responsável</label><input type="text" id="edit-responsavel" value="'+(d.responsavel||'')+'">'
+
+  if(d.tipo.includes('Escola')){
+    h+='<label>Qtd Alunos</label><input type="number" id="edit-qtd" value="'+(d.qtd_alunos||'')+'">'
+  }else if(d.tipo.includes('Lar')){
+    h+='<label>Qtd Idosos</label><input type="number" id="edit-qtd" value="'+(d.qtd_idosos||'')+'">'
+  }
+
+  if(!d.tipo.includes('Voluntário')){
+    h+='<label>Espaço para horta?</label><select id="edit-espaco">'
+      +'<option'+(!d.espaco_horta?' selected':'')+'>Selecione...</option>'
+      +'<option'+(d.espaco_horta==='Sim'?' selected':'')+'>Sim</option>'
+      +'<option'+(d.espaco_horta==='Não, mas interesse'?' selected':'')+'>Não, mas interesse</option>'
+      +'<option'+(d.espaco_horta==='Precisamos avaliar'?' selected':'')+'>Precisamos avaliar</option>'
+      +'</select>'
+  }
+
+  h+='<label>Obs</label><textarea id="edit-obs">'+(d.observacoes||'')+'</textarea>'
+  h+='<button class="btn" id="btn-salvar-edicao" onclick="salvarEdicao()">💾 Salvar</button>'
+  h+='<button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px">Cancelar</button>'
+
+  document.getElementById('form-editar').innerHTML=h
+  document.getElementById('modal-editar').classList.add('ativo')
+}
+
+function fecharModalEditar(){document.getElementById('modal-editar').classList.remove('ativo');editandoId=null}
+
+async function salvarEdicao(){
+  if(!editandoId)return
+
+  var tipo=document.getElementById('edit-tipo').value
+  var atualizacao={
+    tipo:tipo,
+    nome:document.getElementById('edit-nome').value,
+    endereco:document.getElementById('edit-endereco').value,
+    telefone:document.getElementById('edit-telefone').value,
+    email:document.getElementById('edit-email').value,
+    responsavel:document.getElementById('edit-responsavel').value,
+    observacoes:document.getElementById('edit-obs').value
+  }
+
+  if(tipo.includes('Escola'))atualizacao.qtd_alunos=document.getElementById('edit-qtd').value
+  else if(tipo.includes('Lar'))atualizacao.qtd_idosos=document.getElementById('edit-qtd').value
+
+  var campoEspaco=document.getElementById('edit-espaco')
+  if(campoEspaco)atualizacao.espaco_horta=campoEspaco.value
+
+  var btn=document.getElementById('btn-salvar-edicao')
+  btn.disabled=true;btn.textContent='Salvando...'
+
+  try{
+    await window.fsUpdate(window.fsDoc(window.db,CADASTROS_COL,editandoId), atualizacao)
+    fecharModalEditar()
+    abrirLista()
+  }catch(err){
+    console.error(err)
+    alert('❌ Erro ao salvar edição: '+err.message)
+    btn.disabled=false;btn.textContent='💾 Salvar'
+  }
+}
+
+document.getElementById('importExcel').addEventListener('change',function(e){
+  var a=e.target.files[0];if(!a)return
+  if(!isAdmin()){alert('Só admin pode importar.');return}
+  if(!firebasePronto){alert('Conectando ao banco de dados, tente novamente em instantes.');return}
+
+  var r=new FileReader()
+  r.onload=async function(ev){
+    try{
+      var d=new Uint8Array(ev.target.result)
+      var w=XLSX.read(d,{type:'array'})
+      var p=w.Sheets[w.SheetNames[0]]
+      var linhas=XLSX.utils.sheet_to_json(p,{header:1})
+
+      var imp=0,err=0
+      // Colunas esperadas: 0 tipo | 1 nome | 2 endereco | 3 telefone | 4 email | 5 responsavel | 6 qtd_alunos | 7 espaco_horta | 8 observacoes
+      for(var i=1;i<linhas.length;i++){
+        var v=linhas[i]
+        if(!v||v.length<2||!v[1]){err++;continue}
+
+        // Normaliza o tipo (planilhas podem vir com "ESCOLA", "escola", etc)
+        var tipoTexto=String(v[0]||'Escola').trim().toLowerCase()
+        var tipoNormalizado=(tipoTexto.indexOf('lar')>=0||tipoTexto.indexOf('idoso')>=0)?'🏠 Lar de Idosos':(tipoTexto.indexOf('volunt')>=0?'🤝 Voluntário':'🏫 Escola')
+
+        var registro={
+          tipo:tipoNormalizado,
+          nome:String(v[1]||'').trim(),
+          endereco:String(v[2]||'').trim(),
+          telefone:String(v[3]||'').trim(),
+          email:String(v[4]||'').trim(),
+          responsavel:String(v[5]||'').trim(),
+          qtd_alunos:String(v[6]||'').trim(),
+          espaco_horta:String(v[7]||'').trim(),
+          observacoes:String(v[8]||'').trim(),
+          data:new Date().toLocaleDateString('pt-BR'),
+          criadoEm:Date.now(),
+          status:'aprovado',
+          aprovadoPor:usuarioLogado().email
         }
-        h += '</tr>';
-      });
-      h += '</table></div>';
-      if (isAdmin()) { var p = lista.filter(function(d) { return d.status === 'pendente'; }).length; if (p > 0) h = '<div class="aviso-admin">📌 ' + p + ' aguardando aprovação</div>' + h; }
-      tabela.innerHTML = h;
-    })
-    .catch(function(err) { tabela.innerHTML = '<p style="text-align:center;color:#c0392b;">Erro ao carregar.</p>'; });
-}
-
-// ===== EXCLUIR =====
-function excluirCadastro(id) {
-  if (!isAdmin()) { alert('Só admin.'); return; }
-  if (!confirm('Tem certeza?')) return;
-  console.log('Excluindo ID:', id); // ← pra ver se o id vem certo
-  db.collection('cadastros').doc(id).delete()
-    .then(function() { abrirLista(); })
-    .catch(function(err) { 
-      console.error('Erro completo:', err); // ← mostra o erro real no console
-      alert('Erro ao excluir: ' + err.message); // ← mostra a mensagem real
-    });
-}
-function aprovarCadastro(id) {
-  if (!isAdmin()) return;
-  db.collection('cadastros').doc(id).update({ status: 'aprovado', aprovadoPor: usuarioLogado.email })
-    .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
-}
-function rejeitarCadastro(id) {
-  if (!isAdmin()) return;
-  db.collection('cadastros').doc(id).update({ status: 'rejeitado' })
-    .then(function() { abrirLista(); })
-    .catch(function(err) { alert('Erro.'); });
-}
-
-// ===== EDITAR =====
-function abrirEditar(id) {
-  if (!isAdmin()) { alert('Só admin.'); return; }
-  db.collection('cadastros').doc(id).get()
-    .then(function(doc) {
-      if (!doc.exists) return;
-      var d = doc.data();
-      editandoId = id;
-      var h = '<label>Tipo</label><select id="edit-tipo"><option' + (d.tipo.includes('Escola') ? ' selected' : '') + '>🏫 Escola</option><option' + (d.tipo.includes('Lar') ? ' selected' : '') + '>🏠 Lar de Idosos</option><option' + (d.tipo.includes('Voluntário') ? ' selected' : '') + '>🤝 Voluntário</option></select>';
-      h += '<label>Nome</label><input type="text" id="edit-nome" value="' + (d.nome || '') + '">';
-      h += '<label>Endereço</label><input type="text" id="edit-endereco" value="' + (d.endereco || '') + '">';
-      h += '<label>Telefone</label><input type="text" id="edit-telefone" value="' + (d.telefone || '') + '">';
-      h += '<label>E-mail</label><input type="email" id="edit-email" value="' + (d.email || '') + '">';
-      h += '<label>Responsável</label><input type="text" id="edit-responsavel" value="' + (d.responsavel || '') + '">';
-      h += '<label>Quantidade de Alunos (aprox.)</label><input type="number" id="edit-alunos" value="' + (d.quantidade_alunos || '') + '">';
-      h += '<label>Possui Espaço para Horta</label><select id="edit-espaco"><option value="">Selecione...</option><option value="Sim"' + (d.possui_espaco_horta === 'Sim' ? ' selected' : '') + '>Sim</option><option value="Não"' + (d.possui_espaco_horta === 'Não' ? ' selected' : '') + '>Não</option><option value="Parcial"' + (d.possui_espaco_horta === 'Parcial' ? ' selected' : '') + '>Parcial</option></select>';
-      h += '<label>Obs</label><textarea id="edit-obs">' + (d.observacoes || '') + '</textarea>';
-      h += '<button class="btn" onclick="salvarEdicao()">💾 Salvar</button><button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px">Cancelar</button>';
-      document.getElementById('form-editar').innerHTML = h;
-      document.getElementById('modal-editar').classList.add('ativo');
-    });
-}
-function fecharModalEditar() { document.getElementById('modal-editar').classList.remove('ativo'); editandoId = null; }
-function salvarEdicao() {
-  var dadosAtualizados = {
-    tipo: document.getElementById('edit-tipo').value,
-    nome: document.getElementById('edit-nome').value,
-    endereco: document.getElementById('edit-endereco').value,
-    telefone: document.getElementById('edit-telefone').value,
-    email: document.getElementById('edit-email').value,
-    responsavel: document.getElementById('edit-responsavel').value,
-    quantidade_alunos: document.getElementById('edit-alunos').value,
-    possui_espaco_horta: document.getElementById('edit-espaco').value,
-    observacoes: document.getElementById('edit-obs').value
-  };
-
-  db.collection('cadastros').doc(editandoId).update(dadosAtualizados)
-    .then(function() { fecharModalEditar(); abrirLista(); })
-    .catch(function(err) { alert('Erro ao salvar: ' + err.message); });
-}
-
-// ===== IMPORTAR EXCEL PARA FIRESTORE =====
-document.getElementById('importExcel').addEventListener('change', function(e) {
-  const arquivo = e.target.files[0];
-  if (!arquivo) return;
-
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      const data = new Uint8Array(ev.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const primeiraAba = workbook.SheetNames[0];
-      const planilha = workbook.Sheets[primeiraAba];
-      const linhas = XLSX.utils.sheet_to_json(planilha, { header: 1 });
-
-      let importados = 0;
-      let erros = 0;
-      const promessas = [];
-
-      for (let i = 1; i < linhas.length; i++) {
-        const valores = linhas[i];
-        if (!valores || valores.length < 2 || !valores[1]) { erros++; continue; }
-
-        const dados = {
-          tipo: '🏫 Escola',
-          nome: String(valores[1] || '').trim(),
-          endereco: String(valores[2] || '').trim(),
-          telefone: String(valores[3] || '').trim(),
-          email: String(valores[4] || '').trim(),
-          responsavel: String(valores[5] || '').trim(),
-          qtd_alunos: String(valores[6] || '').trim(),
-          observacoes: String(valores[7] || '').trim(),
-          data: new Date().toLocaleDateString('pt-BR'),
-          status: 'aprovado',
-          aprovadoPor: 'admin',
-          autorEmail: 'admin@raizes.com',
-          autorNome: 'Admin'
-        };
-
-        promessas.push(db.collection('cadastros').add(dados));
-        importados++;
+        await window.fsAdd(window.fsCollection(window.db,CADASTROS_COL), registro)
+        imp++
       }
 
-      Promise.all(promessas)
-        .then(function() {
-          document.getElementById('resultadoImport').innerHTML = '<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600">✅ ' + importados + ' escola(s) importada(s) para o Firebase' + (erros ? '. ⚠️ ' + erros + ' linha(s) ignoradas' : '') + '</span>';
-        })
-        .catch(function(err) {
-          document.getElementById('resultadoImport').innerHTML = '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600">❌ Erro ao salvar no Firebase.</span>';
-        });
-
-    } catch(err) {
-      document.getElementById('resultadoImport').innerHTML = '<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600">❌ Erro ao ler o arquivo. Verifique se é .xlsx válido.</span>';
+      document.getElementById('resultadoImport').innerHTML='<span style="color:#155724;background:#d4edda;padding:8px 16px;border-radius:6px;font-weight:600">✅ '+imp+' escola(s)'+(err?'. ⚠️ '+err:'')+'</span>'
+      abrirLista()
+    }catch(e){
+      console.error(e)
+      document.getElementById('resultadoImport').innerHTML='<span style="color:#721c24;background:#f8d7da;padding:8px 16px;border-radius:6px;font-weight:600">❌ Erro.</span>'
     }
-  };
-  reader.readAsArrayBuffer(arquivo);
-});
+  }
+  r.readAsArrayBuffer(a)
+})
+
+window.addEventListener('firebase-pronto',function(){firebasePronto=true})
+
+init()
 </script>
 </body>
 </html>
