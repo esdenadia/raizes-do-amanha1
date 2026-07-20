@@ -531,27 +531,40 @@ async function abrirEditar(id){
     +'<option'+(d.tipo.includes('Lar')?' selected':'')+'>🏠 Lar de Idosos</option>'
     +'<option'+(d.tipo.includes('Voluntário')?' selected':'')+'>🤝 Voluntário</option></select>'
   h+='<label>Nome</label><input type="text" id="edit-nome" value="'+(d.nome||'')+'">'
-  h+='<label>Endereço</label><input type="text" id="edit-endereco" value="'+(d.endereco||'')+'">'
-  h+='<label>Telefone</label><input type="text" id="edit-telefone" value="'+(d.telefone||'')+'">'
-  h+='<label>E-mail</label><input type="email" id="edit-email" value="'+(d.email||'')+'">'
-  h+='<label>Responsável</label><input type="text" id="edit-responsavel" value="'+(d.responsavel||'')+'">'
 
-  if(d.tipo.includes('Escola')){
-    h+='<label>Qtd Alunos</label><input type="number" id="edit-qtd" value="'+(d.qtd_alunos||'')+'">'
-  }else if(d.tipo.includes('Lar')){
-    h+='<label>Qtd Idosos</label><input type="number" id="edit-qtd" value="'+(d.qtd_idosos||'')+'">'
-  }
+  if(d.tipo.includes('Voluntário')){
+    h+='<label>Telefone</label><input type="text" id="edit-telefone" value="'+(d.telefone||'')+'">'
+    h+='<label>E-mail</label><input type="email" id="edit-email" value="'+(d.email||'')+'">'
+    h+='<label>Área</label><select id="edit-area">'
+      +'<option'+(d.area==='Agricultura/Horta'?' selected':'')+'>Agricultura/Horta</option>'
+      +'<option'+(d.area==='Administrativo'?' selected':'')+'>Administrativo</option>'
+      +'<option'+(d.area==='Divulgação'?' selected':'')+'>Divulgação</option>'
+      +'<option'+(d.area==='Transporte'?' selected':'')+'>Transporte</option>'
+      +'<option'+(d.area==='Flexível'?' selected':'')+'>Flexível</option>'
+      +'</select>'
+    h+='<label>Mensagem</label><textarea id="edit-mensagem">'+(d.mensagem||'')+'</textarea>'
+  }else{
+    h+='<label>Endereço</label><input type="text" id="edit-endereco" value="'+(d.endereco||'')+'">'
+    h+='<label>Telefone</label><input type="text" id="edit-telefone" value="'+(d.telefone||'')+'">'
+    h+='<label>E-mail</label><input type="email" id="edit-email" value="'+(d.email||'')+'">'
+    h+='<label>Responsável</label><input type="text" id="edit-responsavel" value="'+(d.responsavel||'')+'">'
 
-  if(!d.tipo.includes('Voluntário')){
+    if(d.tipo.includes('Escola')){
+      h+='<label>Qtd Alunos</label><input type="number" id="edit-qtd" value="'+(d.qtd_alunos||'')+'">'
+    }else if(d.tipo.includes('Lar')){
+      h+='<label>Qtd Idosos</label><input type="number" id="edit-qtd" value="'+(d.qtd_idosos||'')+'">'
+    }
+
     h+='<label>Espaço para horta?</label><select id="edit-espaco">'
       +'<option'+(!d.espaco_horta?' selected':'')+'>Selecione...</option>'
       +'<option'+(d.espaco_horta==='Sim'?' selected':'')+'>Sim</option>'
       +'<option'+(d.espaco_horta==='Não, mas interesse'?' selected':'')+'>Não, mas interesse</option>'
       +'<option'+(d.espaco_horta==='Precisamos avaliar'?' selected':'')+'>Precisamos avaliar</option>'
       +'</select>'
+
+    h+='<label>Obs</label><textarea id="edit-obs">'+(d.observacoes||'')+'</textarea>'
   }
 
-  h+='<label>Obs</label><textarea id="edit-obs">'+(d.observacoes||'')+'</textarea>'
   h+='<button class="btn" id="btn-salvar-edicao" onclick="salvarEdicao()">💾 Salvar</button>'
   h+='<button class="btn" onclick="fecharModalEditar()" style="background:#888;margin-top:10px">Cancelar</button>'
 
@@ -568,18 +581,24 @@ async function salvarEdicao(){
   var atualizacao={
     tipo:tipo,
     nome:document.getElementById('edit-nome').value,
-    endereco:document.getElementById('edit-endereco').value,
     telefone:document.getElementById('edit-telefone').value,
-    email:document.getElementById('edit-email').value,
-    responsavel:document.getElementById('edit-responsavel').value,
-    observacoes:document.getElementById('edit-obs').value
+    email:document.getElementById('edit-email').value
   }
 
-  if(tipo.includes('Escola'))atualizacao.qtd_alunos=document.getElementById('edit-qtd').value
-  else if(tipo.includes('Lar'))atualizacao.qtd_idosos=document.getElementById('edit-qtd').value
+  if(tipo.includes('Voluntário')){
+    atualizacao.area=document.getElementById('edit-area').value
+    atualizacao.mensagem=document.getElementById('edit-mensagem').value
+  }else{
+    atualizacao.endereco=document.getElementById('edit-endereco').value
+    atualizacao.responsavel=document.getElementById('edit-responsavel').value
+    atualizacao.observacoes=document.getElementById('edit-obs').value
 
-  var campoEspaco=document.getElementById('edit-espaco')
-  if(campoEspaco)atualizacao.espaco_horta=campoEspaco.value
+    if(tipo.includes('Escola'))atualizacao.qtd_alunos=document.getElementById('edit-qtd').value
+    else if(tipo.includes('Lar'))atualizacao.qtd_idosos=document.getElementById('edit-qtd').value
+
+    var campoEspaco=document.getElementById('edit-espaco')
+    if(campoEspaco)atualizacao.espaco_horta=campoEspaco.value
+  }
 
   var btn=document.getElementById('btn-salvar-edicao')
   btn.disabled=true;btn.textContent='Salvando...'
